@@ -1,4 +1,5 @@
 using Auth.Application.Abstractions.Database;
+using Auth.Domain.Aggregates.User;
 using Auth.Infrastructure.DomainEvents;
 using Auth.SharedKernel;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ namespace Auth.Infrastructure.Database;
 public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDomainEventDispatcher dispatcher)
     : DbContext(options), IAuthDbContext
 {
+    public DbSet<User> Users { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
