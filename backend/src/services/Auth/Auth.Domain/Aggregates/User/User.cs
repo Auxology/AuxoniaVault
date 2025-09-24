@@ -1,3 +1,4 @@
+using Auth.Domain.Errors;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
 
@@ -27,5 +28,20 @@ public class User : Entity, IAggregateRoot
         CreatedAt = utcNow;
         Avatar = null;
         UpdatedAt = null;
+    }
+
+    public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return Result.Failure<User>(UserErrors.NameRequired);
+        
+        if (name.Length > 256)
+            return Result.Failure<User>(UserErrors.NameTooLong);
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        var user = new User(name, email, utcNow);
+        
+        return Result.Success(user);
     }
 }
