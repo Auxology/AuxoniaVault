@@ -6,4 +6,4 @@ public record VerifyLoginCommand
 (
     string Email,
     int Code
-) : ICommand;
+) : ICommand<string>;

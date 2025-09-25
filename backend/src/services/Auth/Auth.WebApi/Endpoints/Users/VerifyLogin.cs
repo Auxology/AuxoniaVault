@@ -20,7 +20,7 @@ internal sealed class VerifyLogin : IEndpoint
 
             var result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users);
     }

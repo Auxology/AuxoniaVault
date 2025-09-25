@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Auth.Infrastructure;
 
-public static class DepenendecyInjection
+public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
@@ -54,7 +54,9 @@ public static class DepenendecyInjection
         services.AddAuthentication();
 
         services.AddHttpContextAccessor();
+        
         services.AddSingleton<ISecretHasher, SecretHasher>();
+        services.AddSingleton<ITokenProvider, TokenProvider>();
         
         return services;
     }
