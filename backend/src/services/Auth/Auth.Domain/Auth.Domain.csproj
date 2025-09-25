@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Auth.SharedKernel\Auth.SharedKernel.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Entities\" />
-  </ItemGroup>
-
 </Project>

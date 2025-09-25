@@ -1,3 +1,4 @@
+using Auth.Application.Abstractions.LoggingInfo;
 using Auth.Application.Users.VerifyLogin;
 using Auth.WebApi.Infrastructure;
 using MediatR;
@@ -15,8 +16,17 @@ internal sealed class VerifyLogin : IEndpoint
             Request request, 
             HttpContext httpContext, 
             ISender sender) =>
-        {
-            var command = new VerifyLoginCommand(request.Email, request.Code);
+        { 
+            string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
+                             ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                             ?? httpContext.Request.Headers["X-Real-IP"].FirstOrDefault()
+                             ?? "unknown";
+
+            string userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
+
+            var requestMetadata = new RequestMetadata(ipAddress, userAgent);
+            
+            var command = new VerifyLoginCommand(request.Email, request.Code, requestMetadata);
 
             var result = await sender.Send(command);
 

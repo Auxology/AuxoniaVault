@@ -46,6 +46,8 @@ public readonly record struct UserId
     
     public override string ToString() => Value.ToString();
     
+    public bool IsEmpty() => Value == Guid.Empty;
+    
     public static implicit operator Guid(UserId userId) => userId.Value;
     
     public static implicit operator UserId(Guid value) => FromGuid(value).Value;

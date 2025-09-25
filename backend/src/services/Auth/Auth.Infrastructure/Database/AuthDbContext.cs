@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.Database;
 using Auth.Domain.Aggregates.LoginVerification;
+using Auth.Domain.Aggregates.Session;
 using Auth.Domain.Aggregates.User;
 using Auth.Infrastructure.DomainEvents;
 using Auth.SharedKernel;
@@ -13,6 +14,8 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
     public DbSet<User> Users { get; set; }
     
     public DbSet<LoginVerification> LoginVerifications { get; set; }
+    
+    public DbSet<Session> Sessions { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
