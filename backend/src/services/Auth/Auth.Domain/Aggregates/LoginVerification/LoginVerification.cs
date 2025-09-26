@@ -1,4 +1,5 @@
 using Auth.Domain.Errors;
+using Auth.Domain.Events;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
 
@@ -36,6 +37,13 @@ public class LoginVerification : Entity, IAggregateRoot
             return Result.Failure<LoginVerification>(LoginVerificationErrors.InvalidValue);
         
         var loginVerification = new LoginVerification(identifier, value, utcNow);
+        
+        loginVerification.Raise(new LoginRequestedDomainEvent
+        (
+            Email: loginVerification.Identifier.Value,
+            Token: loginVerification.Value,
+            RequestedAt: loginVerification.CreatedAt
+        ));
         
         return Result.Success(loginVerification);
     }

@@ -1,4 +1,3 @@
-using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
 using Auth.Domain.Aggregates.LoginVerification;
@@ -29,13 +28,13 @@ internal sealed class RequestLoginCommandHandler(IAuthDbContext context, IDateTi
 
         int loginCode = Random.Shared.Next(100000, 999999);
         
-        Result<LoginVerification> loginVerification = LoginVerification.Create(emailResult.Value, loginCode, dateTimeProvider.UtcNow);
+        Result<LoginVerification> loginResult = LoginVerification.Create(emailResult.Value, loginCode, dateTimeProvider.UtcNow);
         
-        if (loginVerification.IsFailure)
-            return Result.Failure(loginVerification.Error);
+        if (loginResult.IsFailure)
+            return Result.Failure(loginResult.Error);
         
-        await context.LoginVerifications.AddAsync(loginVerification.Value, cancellationToken);
-       
+        await context.LoginVerifications.AddAsync(loginResult.Value, cancellationToken);
+        
         await context.SaveChangesAsync(cancellationToken);
         
         return Result.Success();

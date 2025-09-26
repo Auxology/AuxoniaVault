@@ -1,11 +1,16 @@
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
+using Auth.Application.Abstractions.Messaging;
+using Auth.Domain.Events;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Database;
 using Auth.Infrastructure.DomainEvents;
+using Auth.Infrastructure.IntegrationEvents.RequestLogin;
 using Auth.Infrastructure.Jobs;
 using Auth.Infrastructure.Time;
 using Auth.SharedKernel;
+using MassTransit;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,12 +20,15 @@ namespace Auth.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
+    public static IServiceCollection
+        AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddServices()
             .AddDatabase(configuration)
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal();
+            .AddAuthorizationInternal()
+            .AddMassTransit(configuration)
+            .AddConsumers();
     
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -89,6 +97,44 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
         services.AddAuthorization();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddMassTransit(this IServiceCollection services, IConfiguration configuration)
+    {
+        var rabbitMqHost = configuration["RabbitMQ:Host"];
+        var rabbitMqPort = configuration["RabbitMQ:Port"];
+        var rabbitMqUsername = configuration["RabbitMQ:Username"];
+        var rabbitMqPassword = configuration["RabbitMQ:Password"];
+
+        if (string.IsNullOrEmpty(rabbitMqUsername) || string.IsNullOrEmpty(rabbitMqPassword) ||
+            string.IsNullOrEmpty(rabbitMqHost) || string.IsNullOrEmpty(rabbitMqPort)) 
+            throw new InvalidOperationException("RabbitMQ credentials are not configured properly.");
+
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumers(typeof(DependencyInjection).Assembly);
+            
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqHost, ushort.Parse(rabbitMqPort), "/", h =>
+                {
+                    h.Username(rabbitMqUsername);
+                    h.Password(rabbitMqPassword);
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+        
+        return services;
+    }
+
+    private static IServiceCollection AddConsumers(this IServiceCollection services)
+    {
+        services.AddTransient<INotificationHandler<DomainEventNotification<LoginRequestedDomainEvent>>,
+            LoginRequestedDomainEventHandler>();
         
         return services;
     }

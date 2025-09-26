@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Shared\Shared.csproj" />
       <ProjectReference Include="..\Auth.Application\Auth.Application.csproj" />
       <ProjectReference Include="..\Auth.Domain\Auth.Domain.csproj" />
       <ProjectReference Include="..\Auth.SharedKernel\Auth.SharedKernel.csproj" />
@@ -15,6 +16,10 @@
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
       <PackageReference Include="Isopoh.Cryptography.Argon2" Version="2.0.0" />
+      <PackageReference Include="MassTransit" Version="8.5.3" />
+      <PackageReference Include="MassTransit.Abstractions" Version="8.5.3" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.3" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.9" />
