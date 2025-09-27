@@ -25,4 +25,7 @@ public readonly record struct Error(string Code, string Description, ErrorType T
     
     public static Error Conflict(string code, string description) 
         => new(code, description, ErrorType.Conflict);
+    
+    public static Error Unauthorized(string code, string description) 
+        => new(code, description, ErrorType.Unauthorized);
 }
