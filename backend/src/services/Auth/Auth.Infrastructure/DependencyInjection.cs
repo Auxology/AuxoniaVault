@@ -87,7 +87,8 @@ public static class DependencyInjection
         services.AddAuthentication();
 
         services.AddHttpContextAccessor();
-        
+
+        services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<ISecretHasher, SecretHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         

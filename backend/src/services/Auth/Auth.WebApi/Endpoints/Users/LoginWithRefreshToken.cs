@@ -12,29 +12,29 @@ internal sealed class LoginWithRefreshToken : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("api/auth/refresh-token", async
-        (
-            Request request,
-            HttpContext httpContext,
-            ISender sender
-        )
-        =>
-        {
-            string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
-                               ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                               ?? httpContext.Request.Headers["X-Real-IP"].FirstOrDefault()
-                               ?? "unknown";
+                (
+                    Request request,
+                    HttpContext httpContext,
+                    ISender sender
+                )
+                =>
+            {
+                string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
+                                   ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                                   ?? httpContext.Request.Headers["X-Real-IP"].FirstOrDefault()
+                                   ?? "unknown";
 
-            string userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
-            
-            var requestMetadata = new RequestMetadata(ipAddress, userAgent);
-            
-            var command = new LoginWithRefreshTokenCommand(request.RefreshToken, requestMetadata);
-            
-            var result = await sender.Send(command);
-            
-            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+                string userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
 
-        })
-        .WithTags(Tags.Users);
+                var requestMetadata = new RequestMetadata(ipAddress, userAgent);
+
+                var command = new LoginWithRefreshTokenCommand(request.RefreshToken, requestMetadata);
+
+                var result = await sender.Send(command);
+
+                return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+
+            })
+            .WithTags(Tags.Users).RequireAuthorization();
     }
 }
