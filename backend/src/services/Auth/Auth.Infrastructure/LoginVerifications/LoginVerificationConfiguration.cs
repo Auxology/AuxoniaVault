@@ -1,4 +1,5 @@
 using Auth.Domain.Aggregates.LoginVerification;
+using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -20,7 +21,7 @@ internal sealed class LoginVerificationConfiguration : IEntityTypeConfiguration<
             .IsRequired();
         
         b.Property(lv => lv.Identifier)
-            .HasMaxLength(256)
+            .HasMaxLength(UserConstants.MaxEmailLength)
             .HasConversion(
                 email => email.Value,
                 value => EmailAddress.UnsafeFromString(value))

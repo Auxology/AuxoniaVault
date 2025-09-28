@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.Domain.Errors;
 using Auth.Domain.Events;
 using Auth.Domain.ValueObjects;
@@ -28,7 +29,7 @@ public class LoginVerification : Entity, IAggregateRoot
         Value = value;
         CreatedAt = utcNow;
         UpdatedAt = utcNow;
-        ExpiresAt = CreatedAt.AddMinutes(10);
+        ExpiresAt = CreatedAt.AddMinutes(LoginVerificationConstants.ExpiresInMinutes);
     }
     
     public static Result<LoginVerification> Create(EmailAddress identifier, int value, DateTimeOffset utcNow)

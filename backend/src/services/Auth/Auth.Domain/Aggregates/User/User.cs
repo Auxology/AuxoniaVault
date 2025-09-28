@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.Domain.Errors;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
@@ -35,7 +36,7 @@ public class User : Entity, IAggregateRoot
         if (string.IsNullOrWhiteSpace(name))
             return Result.Failure<User>(UserErrors.NameRequired);
         
-        if (name.Length > 256)
+        if (name.Length > UserConstants.MaxNameLength)
             return Result.Failure<User>(UserErrors.NameTooLong);
         
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
@@ -43,5 +44,21 @@ public class User : Entity, IAggregateRoot
         var user = new User(name, email, utcNow);
         
         return Result.Success(user);
+    }
+    
+    public Result ChangeName(string newName, IDateTimeProvider dateTimeProvider)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            return Result.Failure(UserErrors.NameRequired);
+        
+        if (newName.Length > UserConstants.MaxNameLength)
+            return Result.Failure(UserErrors.NameTooLong);
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        Name = newName;
+        UpdatedAt = utcNow;
+        
+        return Result.Success();
     }
 }

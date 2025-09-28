@@ -1,8 +1,11 @@
+using Auth.Application.Users.ChangeName;
+using Auth.SharedKernel;
+using Auth.WebApi.Infrastructure;
 using MediatR;
 
 namespace Auth.WebApi.Endpoints.Users;
 
-internal sealed class UpdateName : IEndpoint
+internal sealed class ChangeName : IEndpoint
 {
     private sealed record Request(string Name);
     
@@ -11,14 +14,15 @@ internal sealed class UpdateName : IEndpoint
         app.MapPost("/api/auth/change-name", async
         (
             Request request,
-            ISender sender
+            ISender sender,
+            HttpContext httpContext
         ) =>
         {
-            var command = new ChangeName(request.Name);
+            var command = new ChangeNameCommand(request.Name);
 
-            var result = await sender.Send(command);
+            Result<string> result = await sender.Send(command);
 
-            return .IsSuccess ? Results.Ok() : CustomResults.Problem(result);
+            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users)
         .RequireAuthorization();

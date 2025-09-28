@@ -1,4 +1,5 @@
 using Auth.Domain.Aggregates.Session;
+using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -33,12 +34,12 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             .IsRequired();
         
         b.Property(s => s.IpAddress)
-            .HasMaxLength(45)
+            .HasMaxLength(SessionConstants.MaxIpLength)
             .HasColumnType("text")
             .IsRequired();
         
         b.Property(s => s.UserAgent)
-            .HasMaxLength(512)
+            .HasMaxLength(SessionConstants.MaxUserAgentLength)
             .HasColumnType("text")
             .IsRequired();
         

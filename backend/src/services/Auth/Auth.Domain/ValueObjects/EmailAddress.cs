@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.SharedKernel;
 
 namespace Auth.Domain.ValueObjects;
@@ -14,6 +15,12 @@ public readonly record struct EmailAddress
     (
         "EmailAddress.Invalid",
         "Email address is not in a valid format."
+    );
+    
+    private static Error TooLong => Error.Validation
+    (
+        "EmailAddress.TooLong",
+        $"Email address cannot be longer than {UserConstants.MaxEmailLength} characters."
     );
     
     public string Value { get; }
@@ -40,6 +47,9 @@ public readonly record struct EmailAddress
     
     private static Result Validate(string email)
     {
+        if (email.Length > UserConstants.MaxEmailLength)
+            return Result.Failure(TooLong);
+        
         try
         {
             var addr = new System.Net.Mail.MailAddress(email);

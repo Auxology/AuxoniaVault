@@ -1,4 +1,5 @@
 using Auth.Domain.Aggregates.User;
+using Auth.Domain.Constants;
 using Auth.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -21,12 +22,12 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
         
         b.Property(u => u.Name)
-            .HasMaxLength(256)
+            .HasMaxLength(UserConstants.MaxNameLength)
             .HasColumnType("varchar")
             .IsRequired();
         
         b.Property(u => u.Email)
-            .HasMaxLength(256)
+            .HasMaxLength(UserConstants.MaxEmailLength)
             .HasConversion(
                 email => email.Value,
                 value => EmailAddress.UnsafeFromString(value)

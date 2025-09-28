@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.Domain.Errors;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
@@ -30,7 +31,7 @@ public class Session : Entity, IAggregateRoot
         IpAddress = ipAddress;
         UserAgent = userAgent;
         CreatedAt = dateTimeProvider.UtcNow;
-        ExpiresAt = CreatedAt.AddDays(30);
+        ExpiresAt = CreatedAt.AddDays(SessionConstants.ExpiresInDays);
     }
 
     public static Result<Session> Create(UserId userId, string token, string ipAddress, string userAgent,

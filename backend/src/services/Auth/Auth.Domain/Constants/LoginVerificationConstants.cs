@@ -1,6 +1,6 @@
 namespace Auth.Domain.Constants;
 
-public class LoginVerificationConstants
+public static class LoginVerificationConstants
 {
-    
+    public const int ExpiresInMinutes = 10;
 }

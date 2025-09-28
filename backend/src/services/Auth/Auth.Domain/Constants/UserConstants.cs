@@ -1,6 +1,8 @@
 namespace Auth.Domain.Constants;
 
-public class UserConstants
+public static class UserConstants
 {
-    
+    public const int MaxNameLength = 256;
+
+    public const int MaxEmailLength = 256;
 }
