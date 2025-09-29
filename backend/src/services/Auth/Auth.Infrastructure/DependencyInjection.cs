@@ -6,6 +6,7 @@ using Auth.Domain.Events;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Database;
 using Auth.Infrastructure.DomainEvents;
+using Auth.Infrastructure.IntegrationEvents.EmailChangeRequested;
 using Auth.Infrastructure.IntegrationEvents.RequestLogin;
 using Auth.Infrastructure.Jobs;
 using Auth.Infrastructure.Time;
@@ -151,6 +152,8 @@ public static class DependencyInjection
         services.AddTransient<INotificationHandler<DomainEventNotification<LoginRequestedDomainEvent>>,
             LoginRequestedDomainEventHandler>();
         
+        services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangeRequestedDomainEvent>>,
+            EmailChangeRequestedDomainEventHandler>();
         return services;
     }
 }

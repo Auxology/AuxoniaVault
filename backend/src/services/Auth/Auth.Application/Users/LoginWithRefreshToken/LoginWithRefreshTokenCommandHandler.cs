@@ -16,7 +16,7 @@ internal sealed class LoginWithRefreshTokenCommandHandler(IAuthDbContext context
         Session? session = await context.Sessions
             .FirstOrDefaultAsync(s => s.Token == request.RefreshToken, cancellationToken);
 
-        if (session is null || session.ExpiresAt < dateTimeProvider.UtcNow)
+        if (session is null || session.ExpiresAt <= dateTimeProvider.UtcNowForDatabaseComparison())
             return Result.Failure<LoginWithRefreshTokenResponse>(SessionErrors.RefreshTokenExpired);
         
         User? user = await context.Users

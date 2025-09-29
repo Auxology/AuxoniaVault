@@ -2,6 +2,7 @@ using Auth.Application.Abstractions.Database;
 using Auth.Domain.Aggregates.LoginVerification;
 using Auth.Domain.Aggregates.Session;
 using Auth.Domain.Aggregates.User;
+using Auth.Domain.Entities;
 using Auth.Infrastructure.DomainEvents;
 using Auth.SharedKernel;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
     public DbSet<LoginVerification> LoginVerifications { get; set; }
     
     public DbSet<Session> Sessions { get; set; }
+    
+    public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

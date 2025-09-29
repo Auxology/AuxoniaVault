@@ -1,4 +1,5 @@
 using Auth.Domain.Constants;
+using Auth.Domain.Entities;
 using Auth.Domain.Errors;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
@@ -19,6 +20,8 @@ public class User : Entity, IAggregateRoot
     
     public DateTimeOffset? UpdatedAt { get; private set; }
     
+    public virtual ICollection<EmailChangeRequest> EmailChangeRequests { get; private set; }
+    
     private User() { } // For EF Core
     
     private User(string name, EmailAddress email, DateTimeOffset utcNow)
@@ -29,6 +32,7 @@ public class User : Entity, IAggregateRoot
         CreatedAt = utcNow;
         Avatar = null;
         UpdatedAt = null;
+        EmailChangeRequests = [];
     }
 
     public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
@@ -60,5 +64,23 @@ public class User : Entity, IAggregateRoot
         UpdatedAt = utcNow;
         
         return Result.Success();
+    }
+
+    public Result<EmailChangeRequest> RequestEmailChange(EmailAddress newEmail, IDateTimeProvider dateTimeProvider)
+    {
+        var activeRequest = EmailChangeRequests
+            .FirstOrDefault(r => r.CurrentStep != EmailChangeStep.Completed && r.ExpiresAt > dateTimeProvider.UtcNow);
+        
+        if (activeRequest != null)
+            return Result.Failure<EmailChangeRequest>(EmailChangeRequestErrors.ActiveRequestExists);
+        
+        var emailChangeRequestResult = EmailChangeRequest.StartTraditional(Id, Email, newEmail, dateTimeProvider);
+        
+        if (emailChangeRequestResult.IsFailure)
+            return Result.Failure<EmailChangeRequest>(emailChangeRequestResult.Error);
+        
+        EmailChangeRequests.Add(emailChangeRequestResult.Value);
+
+        return emailChangeRequestResult;        
     }
 }

@@ -61,5 +61,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             t.HasCheckConstraint("chk_user_name_not_empty",
                 "name IS NOT NULL AND length(trim(name)) > 0");
         });
+        
+        b.Navigation(u => u.EmailChangeRequests).AutoInclude(false);
     }
 }

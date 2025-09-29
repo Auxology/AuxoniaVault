@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
 using Auth.Domain.Aggregates.LoginVerification;
@@ -26,7 +27,7 @@ internal sealed class RequestLoginCommandHandler(IAuthDbContext context, IDateTi
             return Result.Success();
         }
 
-        int loginCode = Random.Shared.Next(100000, 999999);
+        int loginCode = RandomNumberGenerator.GetInt32(100000, 999999);
         
         Result<LoginVerification> loginResult = LoginVerification.Create(emailResult.Value, loginCode, dateTimeProvider.UtcNow);
         

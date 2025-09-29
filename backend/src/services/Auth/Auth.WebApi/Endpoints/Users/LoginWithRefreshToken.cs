@@ -35,6 +35,6 @@ internal sealed class LoginWithRefreshToken : IEndpoint
                 return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
 
             })
-            .WithTags(Tags.Users).RequireAuthorization();
+            .WithTags(Tags.Users);
     }
 }
