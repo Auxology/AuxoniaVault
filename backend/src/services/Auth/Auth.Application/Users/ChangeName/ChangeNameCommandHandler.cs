@@ -17,7 +17,6 @@ internal sealed class ChangeNameCommandHandler(IAuthDbContext context, IUserCont
         UserId userId = UserId.UnsafeFromGuid(currentUserId);
 
         var user = await context.Users
-            .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
         
         if (user is null)

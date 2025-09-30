@@ -13,6 +13,7 @@ internal sealed class VerifyCommandValidator : AbstractValidator<VerifyLoginComm
             .MaximumLength(UserConstants.MaxEmailLength).WithMessage($"Email cannot be longer than {UserConstants.MaxEmailLength} characters.");
 
         RuleFor(x => x.Code)
-            .NotEmpty().WithMessage("Verification code is required.");
+            .NotEmpty().WithMessage("Verification code is required.")
+            .InclusiveBetween(100000, 999999).WithMessage("Verification code must be a 6-digit number.");
     }
 }

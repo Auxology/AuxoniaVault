@@ -42,7 +42,10 @@ internal sealed class RequestEmailChangeCommandHandler(IAuthDbContext context, I
         
         int currentEmailOtp = RandomNumberGenerator.GetInt32(100000, 999999);
         
-        requestResult.Value.SetCurrentEmailOtp(currentEmailOtp, request.RequestMetadata.IpAddress, request.RequestMetadata.UserAgent);
+        var setOtpResult = requestResult.Value.SetCurrentEmailOtp(currentEmailOtp, request.RequestMetadata.IpAddress, request.RequestMetadata.UserAgent);
+        
+        if (setOtpResult.IsFailure)
+            return Result.Failure(setOtpResult.Error);
         
         await context.EmailChangeRequests.AddAsync(requestResult.Value, cancellationToken);
         

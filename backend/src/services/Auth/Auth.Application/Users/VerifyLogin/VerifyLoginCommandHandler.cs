@@ -28,7 +28,7 @@ internal sealed class VerifyLoginCommandHandler(IAuthDbContext context, ITokenPr
         var loginVerification = await context.LoginVerifications
             .FirstOrDefaultAsync(lv => lv.Identifier == emailResult.Value && lv.Value == request.Code, cancellationToken);
         
-        if (loginVerification is null || loginVerification.ExpiresAt < DateTimeOffset.UtcNow)
+        if (loginVerification is null || loginVerification.ExpiresAt < dateTimeProvider.UtcNowForDatabaseComparison())
             return Result.Failure<VerifyLoginResponse>(LoginVerificationErrors.InvalidOrExpired);
 
         string token = tokenProvider.Create(user);

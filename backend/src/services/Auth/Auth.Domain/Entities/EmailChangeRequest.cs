@@ -83,8 +83,8 @@ public class EmailChangeRequest : Entity
         if (otp < 100000 || otp > 999999)
             return Result.Failure(EmailChangeRequestErrors.InvalidOtp);
 
-        if (CurrentStep != EmailChangeStep.VerifyCurrent)
-            return Result.Failure(EmailChangeRequestErrors.InvalidStepForCurrentOtp);
+        if (CurrentStep is not EmailChangeStep.VerifyCurrent)
+            return Result.Failure(EmailChangeRequestErrors.InvalidStep);
 
         CurrentEmailOtp = otp;
 
@@ -97,6 +97,29 @@ public class EmailChangeRequest : Entity
             RequestedAt: RequestedAt
         ));
 
+        return Result.Success();
+    }
+
+    public Result VerifyCurrentAndTransitionToVerifyNew(int currentOtp, int newOtp,
+        IDateTimeProvider dateTimeProvider)
+    {
+        if (CurrentStep is not EmailChangeStep.VerifyCurrent)
+            return Result.Failure<int>(EmailChangeRequestErrors.InvalidStep);
+        
+        if (ExpiresAt <= dateTimeProvider.UtcNowForDatabaseComparison() || CurrentEmailOtp != currentOtp)
+            return Result.Failure<int>(EmailChangeRequestErrors.InvalidOtp);
+        
+        NewEmailOtp = newOtp;
+        
+        CurrentStep = EmailChangeStep.VerifyNew;
+        
+        Raise(new EmailChangeCurrentEmailVerifiedDomainEvent
+        (
+            NewEmail: NewEmail.Value,
+            NewOtp: newOtp,
+            RequestedAt: RequestedAt
+        ));
+        
         return Result.Success();
     }
 }

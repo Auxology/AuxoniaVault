@@ -24,12 +24,12 @@ internal static class EmailChangeRequestErrors
     public static Error InvalidOtp => Error.Validation
     (
         code: "EmailChangeRequests.InvalidOtp",
-        description: "The provided OTP is invalid."
+        description: "The provided OTP is invalid or expired."
     );
     
-    public static Error InvalidStepForCurrentOtp => Error.Validation
+    public static Error InvalidStep => Error.Validation
     (
-        code: "EmailChangeRequests.InvalidStepForCurrentOtp",
+        code: "EmailChangeRequests.InvalidStep",
         description: "The email change request is not in the correct step for this operation."
     );
 }

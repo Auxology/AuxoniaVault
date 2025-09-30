@@ -5,9 +5,9 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Shared.Contracts;
 
-namespace Auth.Infrastructure.IntegrationEvents.RequestLogin;
+namespace Auth.Infrastructure.IntegrationEvents.LoginRequested;
 
-public sealed class LoginRequestedDomainEventHandler(IPublishEndpoint publishEndpoint, ILogger<LoginRequestedDomainEventHandler> logger) : INotificationHandler<DomainEventNotification<LoginRequestedDomainEvent>>
+internal sealed class LoginRequestedDomainEventHandler(IPublishEndpoint publishEndpoint, ILogger<LoginRequestedDomainEventHandler> logger) : INotificationHandler<DomainEventNotification<LoginRequestedDomainEvent>>
 {
     public async Task Handle(DomainEventNotification<LoginRequestedDomainEvent> notification, CancellationToken cancellationToken)
     {
@@ -23,5 +23,7 @@ public sealed class LoginRequestedDomainEventHandler(IPublishEndpoint publishEnd
         logger.LogInformation("Publishing {Contract} for {Email}", nameof(LoginRequestedContract), domainEvent.Email);
         
         await publishEndpoint.Publish(contract, cancellationToken);
-    }
+        
+        logger.LogInformation("Published {Contract} for {Email}", nameof(LoginRequestedContract), domainEvent.Email);
+    } 
 }

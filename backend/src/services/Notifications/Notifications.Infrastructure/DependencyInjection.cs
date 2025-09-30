@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddAWSService<IAmazonSimpleEmailService>();
         
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.ConfigurationSectionName));
+        services.AddScoped<EmailTemplateService>();
         
         return services;
     }
