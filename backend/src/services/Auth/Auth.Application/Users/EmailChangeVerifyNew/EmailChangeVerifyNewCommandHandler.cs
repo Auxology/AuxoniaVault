@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
@@ -8,29 +7,33 @@ using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Auth.Application.Users.EmailChangeVerifyCurrent;
+namespace Auth.Application.Users.EmailChangeVerifyNew;
 
-internal sealed class EmailChangeVerifyCurrentCommandHandler(IAuthDbContext context, IUserContext userContext,IDateTimeProvider dateTimeProvider) : ICommandHandler<EmailChangeVerifyCurrentCommand>
+internal sealed class EmailChangeVerifyNewCommandHandler(IAuthDbContext context, IUserContext userContext, IDateTimeProvider dateTimeProvider) : ICommandHandler<EmailChangeVerifyNewCommand>
 {
-    public async Task<Result> Handle(EmailChangeVerifyCurrentCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(EmailChangeVerifyNewCommand request, CancellationToken cancellationToken)
     {
         Guid currentUserId = userContext.UserId;
-        
+
         UserId userId = UserId.UnsafeFromGuid(currentUserId);
-        
+
         var user = await context.Users
             .Include(u => u.EmailChangeRequests)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        
+
         if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
-        
-        int newEmailOtp = RandomNumberGenerator.GetInt32(100000, 999999);
-        
-        Result verifyResult = user.VerifyCurrentEmail(request.CurrentOtp, newEmailOtp, dateTimeProvider);
 
+        Result verifyResult = user.VerifyNewEmail(request.NewOtp, dateTimeProvider);
+        
         if (verifyResult.IsFailure)
             return Result.Failure(verifyResult.Error);
+        
+        var userSessions = await context.Sessions
+            .Where(s => s.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        context.Sessions.RemoveRange(userSessions);
         
         await context.SaveChangesAsync(cancellationToken);
         

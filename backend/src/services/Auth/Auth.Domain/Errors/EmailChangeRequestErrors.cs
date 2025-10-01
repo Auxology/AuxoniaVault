@@ -32,4 +32,10 @@ internal static class EmailChangeRequestErrors
         code: "EmailChangeRequests.InvalidStep",
         description: "The email change request is not in the correct step for this operation."
     );
+    
+    public static Error NotFound => Error.NotFound
+    (
+        code: "EmailChangeRequests.NotFound",
+        description: "No active email change request found."
+    );
 }

@@ -1,14 +1,18 @@
 using System.Text;
+using Amazon.S3;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
+using Auth.Application.Abstractions.Storage;
 using Auth.Domain.Events;
 using Auth.Infrastructure.Authentication;
 using Auth.Infrastructure.Database;
 using Auth.Infrastructure.DomainEvents;
+using Auth.Infrastructure.IntegrationEvents.EmailChanged;
 using Auth.Infrastructure.IntegrationEvents.EmailChangeRequested;
 using Auth.Infrastructure.IntegrationEvents.LoginRequested;
 using Auth.Infrastructure.Jobs;
+using Auth.Infrastructure.Storage;
 using Auth.Infrastructure.Time;
 using Auth.SharedKernel;
 using MassTransit;
@@ -17,6 +21,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Quartz;
 
@@ -31,6 +36,7 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
+            .AddStorage(configuration)
             .AddMassTransit(configuration)
             .AddConsumers();
     
@@ -157,6 +163,30 @@ public static class DependencyInjection
         
         services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangeCurrentEmailVerifiedDomainEvent>>,
             EmailChangeCurrentEmailVerifiedDomainEventHandler>();
+        
+        services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangedDomainEvent>>,
+            EmailChangedDomainEventHandler>();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
+
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var s3Settings = sp.GetRequiredService<IOptions<S3Settings>>().Value;
+            
+            var config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(s3Settings.RegionName)
+            };
+            
+            return new AmazonS3Client(config);
+        });
+
+        services.AddScoped<IStorageServices, StorageServices>();
         
         return services;
     }

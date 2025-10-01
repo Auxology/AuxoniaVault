@@ -122,4 +122,24 @@ public class EmailChangeRequest : Entity
         
         return Result.Success();
     }
+
+    public Result VerifyNewAndComplete(int newOtp, IDateTimeProvider dateTimeProvider)
+    {
+        if (CurrentStep is not EmailChangeStep.VerifyNew)
+            return Result.Failure(EmailChangeRequestErrors.InvalidStep);
+        
+        if (ExpiresAt <= dateTimeProvider.UtcNowForDatabaseComparison() || NewEmailOtp != newOtp)
+            return Result.Failure(EmailChangeRequestErrors.InvalidOtp);
+        
+        CurrentStep = EmailChangeStep.Completed;
+
+        Raise(new EmailChangedDomainEvent
+        (
+            UserId: UserId.Value,
+            NewEmail: NewEmail.Value,
+            ChangedAt: dateTimeProvider.UtcNow
+        ));
+        
+        return Result.Success();
+    }
 }

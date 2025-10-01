@@ -509,4 +509,182 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
 </body>
 </html>";
     }
+
+    public string CreateEmailChangedNotificationTemplate(string newEmail, DateTimeOffset changedAt)
+    {
+        return $@"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Email Successfully Changed - {_settings.CompanyName}</title>
+    <style>
+        body {{
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: oklch(0.3211 0 0);
+            background-color: oklch(0.9846 0.0017 247.8389);
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }}
+        .header {{
+            background: oklch(0.5461 0.2152 262.8809);
+            color: oklch(1.0000 0 0);
+            padding: 32px 24px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }}
+        .content {{
+            padding: 32px 24px;
+        }}
+        .success-container {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 2px solid oklch(0.5461 0.2152 262.8809);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+        }}
+        .success-icon {{
+            font-size: 48px;
+            margin-bottom: 16px;
+        }}
+        .info-box {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-left: 4px solid oklch(0.6231 0.1880 259.8145);
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }}
+        .info-box p {{
+            margin: 0;
+            color: oklch(0.3791 0.1378 265.5222);
+        }}
+        .change-details {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 1px solid oklch(0.9276 0.0058 264.5313);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .change-details h3 {{
+            color: oklch(0.3211 0 0);
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }}
+        .change-details p {{
+            color: oklch(0.5510 0.0234 264.3637);
+            margin: 4px 0;
+            font-size: 14px;
+        }}
+        .footer {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            padding: 24px;
+            text-align: center;
+            color: oklch(0.5510 0.0234 264.3637);
+            font-size: 14px;
+        }}
+        .footer a {{
+            color: oklch(0.6231 0.1880 259.8145);
+            text-decoration: none;
+        }}
+        .security-info {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .security-info h3 {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .security-info p {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0;
+            font-size: 14px;
+        }}
+        .warning-notice {{
+            background-color: oklch(0.6368 0.2078 25.3313);
+            color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .warning-notice h3 {{
+            color: oklch(1.0000 0 0);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .warning-notice p {{
+            color: oklch(1.0000 0 0);
+            margin: 0;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>✅ Email Successfully Changed</h1>
+        </div>
+        
+        <div class=""content"">
+            <h2>Your Email Has Been Updated</h2>
+            <p>Great news! Your email address has been successfully changed for your {_settings.CompanyName} account.</p>
+            
+            <div class=""success-container"">
+                <div class=""success-icon"">🎉</div>
+                <h3>Email Change Complete</h3>
+                <p>Your account is now using the new email address.</p>
+            </div>
+            
+            <div class=""info-box"">
+                <p><strong>📧 New Email:</strong> {newEmail}</p>
+                <p><strong>🕐 Changed At:</strong> {changedAt:yyyy-MM-dd HH:mm:ss UTC}</p>
+            </div>
+            
+            <div class=""change-details"">
+                <h3>📋 Change Summary</h3>
+                <p><strong>Status:</strong> ✅ Successfully completed</p>
+                <p><strong>New Email:</strong> {newEmail}</p>
+                <p><strong>Timestamp:</strong> {changedAt:yyyy-MM-dd HH:mm:ss UTC}</p>
+            </div>
+            
+            <div class=""security-info"">
+                <h3>🔐 Security Information</h3>
+                <p>Your account security remains intact. All your data and settings have been preserved with the new email address.</p>
+            </div>
+            
+            <div class=""warning-notice"">
+                <h3>⚠️ Important Notice</h3>
+                <p>If you did not authorize this email change, please contact our support team immediately to secure your account.</p>
+            </div>
+            
+            <p>You can now use your new email address to log in to your {_settings.CompanyName} account.</p>
+        </div>
+        
+        <div class=""footer"">
+            <p>This email was sent to {newEmail}</p>
+            <p>© {DateTime.UtcNow.Year} {_settings.CompanyName}. All rights reserved.</p>
+            {(!string.IsNullOrEmpty(_settings.SupportEmail) ? $"<p>Need help? Contact us at <a href=\"mailto:{_settings.SupportEmail}\">{_settings.SupportEmail}</a></p>" : "")}
+            {(!string.IsNullOrEmpty(_settings.WebsiteUrl) ? $"<p>Visit our website: <a href=\"{_settings.WebsiteUrl}\">{_settings.WebsiteUrl}</a></p>" : "")}
+        </div>
+    </div>
+</body>
+</html>";
+    }
 }
