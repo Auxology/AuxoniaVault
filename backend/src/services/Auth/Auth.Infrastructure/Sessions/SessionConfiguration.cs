@@ -50,5 +50,14 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         b.Property(s => s.ExpiresAt)
             .HasColumnType("timestamptz")
             .IsRequired();
+        
+        b.Property(s => s.RevokedAt)
+            .HasColumnType("timestamptz")
+            .IsRequired(false);
+        
+        b.Property(s => s.Status)
+            .HasConversion<string>()
+            .HasColumnType("varchar")
+            .IsRequired();
     }
 }

@@ -15,4 +15,10 @@ internal static class UserErrors
         "Users.NotFound",
         "The specified user was not found."
     );
+    
+    public static Error Unauthorized() => Error.Unauthorized
+    (
+        "Users.Unauthorized",
+        "You are not authorized to perform this action."
+    );
 }

@@ -17,9 +17,13 @@ public class Session : Entity, IAggregateRoot
     
     public string UserAgent { get; private set; }
     
+    public SessionStatus Status { get; private set; }
+    
     public DateTimeOffset CreatedAt { get; private set; }
     
     public DateTimeOffset ExpiresAt { get; private set; }
+    
+    public DateTimeOffset? RevokedAt { get; private set; }
     
     private Session() {} // For EF Core
 
@@ -32,6 +36,8 @@ public class Session : Entity, IAggregateRoot
         UserAgent = userAgent;
         CreatedAt = dateTimeProvider.UtcNow;
         ExpiresAt = CreatedAt.AddDays(SessionConstants.ExpiresInDays);
+        Status = SessionStatus.Active;
+        RevokedAt = null;
     }
 
     public static Result<Session> Create(UserId userId, string token, string ipAddress, string userAgent,
@@ -49,5 +55,25 @@ public class Session : Entity, IAggregateRoot
         var session = new Session(userId, token, ipAddress, userAgent, dateTimeProvider);
         
         return Result.Success(session);
+    }
+    
+    public bool IsActive(IDateTimeProvider dateTimeProvider)
+        => Status == SessionStatus.Active && RevokedAt is null && ExpiresAt > dateTimeProvider.UtcNow;
+
+    public Result Revoke(IDateTimeProvider dateTimeProvider)
+    {
+        if (Status == SessionStatus.Revoked)
+            return Result.Failure(SessionErrors.SessionInvalid);
+
+        if (ExpiresAt <= dateTimeProvider.UtcNow)
+        {
+            Status = SessionStatus.Expired;
+            return Result.Failure(SessionErrors.RefreshTokenExpired);
+        }
+        
+        Status = SessionStatus.Revoked;
+        RevokedAt = dateTimeProvider.UtcNow;
+        
+        return Result.Success();
     }
 }

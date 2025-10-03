@@ -4,6 +4,7 @@ using Auth.Application.Abstractions.Messaging;
 using Auth.Application.Errors;
 using Auth.Domain.Aggregates.Session;
 using Auth.Domain.Aggregates.User;
+using Auth.Domain.Errors;
 using Auth.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,7 @@ internal sealed class LoginWithRefreshTokenCommandHandler(IAuthDbContext context
         Session? session = await context.Sessions
             .FirstOrDefaultAsync(s => s.Token == request.RefreshToken, cancellationToken);
 
-        if (session is null || session.ExpiresAt <= dateTimeProvider.UtcNowForDatabaseComparison())
+        if (session is null || session.ExpiresAt <= dateTimeProvider.UtcNowForDatabaseComparison() || !session.IsActive(dateTimeProvider))
             return Result.Failure<LoginWithRefreshTokenResponse>(SessionErrors.RefreshTokenExpired);
         
         User? user = await context.Users
