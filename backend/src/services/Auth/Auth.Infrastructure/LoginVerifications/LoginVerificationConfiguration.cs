@@ -11,7 +11,7 @@ internal sealed class LoginVerificationConfiguration : IEntityTypeConfiguration<
     public void Configure(EntityTypeBuilder<LoginVerification> b)
     {
         b.HasKey(lv => lv.Id);
-        
+
         b.Property(lv => lv.Id)
             .ValueGeneratedNever()
             .HasConversion(
@@ -19,7 +19,7 @@ internal sealed class LoginVerificationConfiguration : IEntityTypeConfiguration<
                 value => LoginVerificationId.UnsafeFromGuid(value))
             .HasColumnType("uuid")
             .IsRequired();
-        
+
         b.Property(lv => lv.Identifier)
             .HasMaxLength(UserConstants.MaxEmailLength)
             .HasConversion(
@@ -27,15 +27,15 @@ internal sealed class LoginVerificationConfiguration : IEntityTypeConfiguration<
                 value => EmailAddress.UnsafeFromString(value))
             .HasColumnType("citext")
             .IsRequired();
-        
+
         b.Property(lv => lv.Value)
             .HasColumnType("text")
             .IsRequired();
-        
+
         b.Property(lv => lv.CreatedAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(lv => lv.UpdatedAt)
             .HasColumnType("timestamptz")
             .IsRequired();

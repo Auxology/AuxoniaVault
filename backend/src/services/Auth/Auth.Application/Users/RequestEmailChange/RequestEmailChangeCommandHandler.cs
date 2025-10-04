@@ -15,22 +15,22 @@ internal sealed class RequestEmailChangeCommandHandler(IAuthDbContext context, I
     public async Task<Result> Handle(RequestEmailChangeCommand request, CancellationToken cancellationToken)
     {
         Guid currentUserId = userContext.UserId;
-        
+
         UserId userId = UserId.UnsafeFromGuid(currentUserId);
         EmailAddress newEmail = EmailAddress.UnsafeFromString(request.Email);
-        
+
         if (await context.Users.AnyAsync(u => u.Email == newEmail, cancellationToken))
             return Result.Failure<Guid>(UserErrors.EmailNotUnique);
-        
+
         var user = await context.Users
             .Include(u => u.EmailChangeRequests)
             .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        
+
         if (user is null)
-            return Result.Failure<string>(UserErrors.UserNotFound);    
-        
+            return Result.Failure<string>(UserErrors.UserNotFound);
+
         int currentEmailOtp = RandomNumberGenerator.GetInt32(100000, 999999);
-        
+
         Result<EmailChangeRequest> requestResult = user.RequestEmailChange
         (
             newEmail,
@@ -39,11 +39,11 @@ internal sealed class RequestEmailChangeCommandHandler(IAuthDbContext context, I
             request.RequestMetadata.UserAgent,
             dateTimeProvider
         );
-        
+
         await context.EmailChangeRequests.AddAsync(requestResult.Value, cancellationToken);
-        
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success();
     }
 }

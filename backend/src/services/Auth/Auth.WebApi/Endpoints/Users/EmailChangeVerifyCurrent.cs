@@ -18,9 +18,9 @@ internal sealed class EmailChangeVerifyCurrent : IEndpoint
         =>
         {
             var command = new EmailChangeVerifyCurrentCommand(request.CurrentOtp);
-            
+
             var result = await sender.Send(command, cancellationToken);
-            
+
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users)

@@ -13,27 +13,27 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
     : DbContext(options), IAuthDbContext
 {
     public DbSet<User> Users { get; set; }
-    
+
     public DbSet<LoginVerification> LoginVerifications { get; set; }
-    
+
     public DbSet<Session> Sessions { get; set; }
-    
+
     public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
         modelBuilder.HasDefaultSchema(Schemas.Default);
-         
+
         base.OnModelCreating(modelBuilder);
     }
-    
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         int result = await base.SaveChangesAsync(cancellationToken);
-        
+
         await PublishDomainEvents();
-        
+
         return result;
     }
 
@@ -45,13 +45,13 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
             .SelectMany(entity =>
             {
                 List<IDomainEvent> events = entity.DomainEvents;
-                
+
                 entity.ClearDomainEvents();
-                
+
                 return events;
             })
             .ToList();
-        
+
         await dispatcher.DispatchAsync(domainEvents);
     }
 }

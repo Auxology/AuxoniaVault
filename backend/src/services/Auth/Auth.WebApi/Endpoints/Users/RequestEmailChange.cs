@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.LoggingInfo;
 using Auth.Application.Users.RequestEmailChange;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -18,21 +19,14 @@ internal sealed class RequestEmailChange : IEndpoint
             ISender sender
         ) =>
         {
-            string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
-                               ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                               ?? httpContext.Request.Headers["X-Real-IP"].FirstOrDefault()
-                               ?? "unknown";
+            var requestMetadata = httpContext.GetRequestMetadata();
 
-            string userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
-            
-            var requestMetadata = new RequestMetadata(ipAddress, userAgent);
-            
             var command = new RequestEmailChangeCommand(request.Email, requestMetadata);
 
             var result = await sender.Send(command);
-            
+
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
-            
+
         })
         .WithTags(Tags.Users)
         .RequireAuthorization();

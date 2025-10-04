@@ -13,24 +13,24 @@ internal sealed class ChangeNameCommandHandler(IAuthDbContext context, IUserCont
     public async Task<Result<string>> Handle(ChangeNameCommand request, CancellationToken cancellationToken)
     {
         Guid currentUserId = userContext.UserId;
-        
+
         UserId userId = UserId.UnsafeFromGuid(currentUserId);
 
         var user = await context.Users
             .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        
+
         if (user is null)
             return Result.Failure<string>(UserErrors.UserNotFound);
-        
+
         Result nameResult = user.ChangeName(request.Name, dateTimeProvider);
-        
+
         if (nameResult.IsFailure)
             return Result.Failure<string>(nameResult.Error);
-        
+
         context.Users.Update(user);
-        
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success(user.Name);
     }
 }

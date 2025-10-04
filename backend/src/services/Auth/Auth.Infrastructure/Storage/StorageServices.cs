@@ -9,7 +9,7 @@ namespace Auth.Infrastructure.Storage;
 internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> options, ILogger<StorageServices> logger) : IStorageServices
 {
     private const string UserProfilePictures = "images/users/profile-pictures";
-    
+
     public async Task<string> PutObjectAsync(IFormFile file, CancellationToken cancellationToken)
     {
         try
@@ -29,16 +29,16 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
                     ["file-name"] = file.FileName
                 }
             };
-        
+
             await amazonS3.PutObjectAsync(putObjectRequest, cancellationToken);
 
             return key;
         }
-        
+
         catch (Exception exception)
         {
             logger.LogError(exception, "An error occurred while uploading the file to S3.");
-            
+
             throw new Exception("An error occurred while uploading the file to S3.");
         }
     }

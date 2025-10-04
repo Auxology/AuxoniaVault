@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Auth.WebApi.Endpoints.Users;
 
-internal sealed class EmailChangeVerifyNew: IEndpoint
+internal sealed class EmailChangeVerifyNew : IEndpoint
 {
     private sealed record Request(int NewOtp);
 

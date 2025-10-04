@@ -9,12 +9,12 @@ namespace Auth.Application.Abstractions.Database;
 public interface IAuthDbContext
 {
     DbSet<User> Users { get; }
-    
+
     DbSet<LoginVerification> LoginVerifications { get; }
-    
+
     DbSet<Session> Sessions { get; }
-    
+
     DbSet<EmailChangeRequest> EmailChangeRequests { get; }
-    
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

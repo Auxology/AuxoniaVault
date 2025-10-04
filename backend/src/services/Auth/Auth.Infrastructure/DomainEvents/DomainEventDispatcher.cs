@@ -24,7 +24,7 @@ internal sealed class DomainEventDispatcher(IPublisher publisher) : IDomainEvent
     private INotification ToNotification(IDomainEvent domainEvent)
     {
         Type notificationType = typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType());
-        
+
         return (INotification)Activator.CreateInstance(notificationType, domainEvent)!;
     }
 }

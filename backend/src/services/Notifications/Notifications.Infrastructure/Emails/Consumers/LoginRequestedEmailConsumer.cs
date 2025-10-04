@@ -17,17 +17,17 @@ public sealed class LoginRequestedEmailConsumer(
     public async Task Consume(ConsumeContext<LoginRequestedContract> context)
     {
         var message = context.Message;
-        
-        logger.LogInformation("Sending login email to {Email} requested at {RequestedAt}", 
+
+        logger.LogInformation("Sending login email to {Email} requested at {RequestedAt}",
             message.Email, message.RequestedAt);
-        
+
         try
         {
             var htmlContent = emailTemplateService.CreateLoginEmailTemplate(
-                message.Email, 
-                message.Token, 
+                message.Email,
+                message.Token,
                 message.RequestedAt);
-            
+
             var request = new SendEmailRequest
             {
                 Source = $"{emailSettings.Value.SenderName} <{emailSettings.Value.SenderEmail}>",
@@ -44,15 +44,15 @@ public sealed class LoginRequestedEmailConsumer(
                     }
                 }
             };
-            
+
             await simpleEmailService.SendEmailAsync(request, context.CancellationToken);
-            
-            logger.LogInformation("Login email sent successfully to {Email}", 
+
+            logger.LogInformation("Login email sent successfully to {Email}",
                 message.Email);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send login email to {Email}", 
+            logger.LogError(ex, "Failed to send login email to {Email}",
                 message.Email);
             throw;
         }

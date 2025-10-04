@@ -12,18 +12,18 @@ internal sealed class LoginRequestedDomainEventHandler(IPublishEndpoint publishE
     public async Task Handle(DomainEventNotification<LoginRequestedDomainEvent> notification, CancellationToken cancellationToken)
     {
         var domainEvent = notification.Event;
-        
+
         var contract = new LoginRequestedContract
         (
             domainEvent.Email,
             domainEvent.Token,
             domainEvent.RequestedAt
         );
-        
+
         logger.LogInformation("Publishing {Contract} for {Email}", nameof(LoginRequestedContract), domainEvent.Email);
-        
+
         await publishEndpoint.Publish(contract, cancellationToken);
-        
+
         logger.LogInformation("Published {Contract} for {Email}", nameof(LoginRequestedContract), domainEvent.Email);
-    } 
+    }
 }

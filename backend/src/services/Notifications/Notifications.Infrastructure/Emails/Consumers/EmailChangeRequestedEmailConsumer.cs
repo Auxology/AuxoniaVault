@@ -17,10 +17,10 @@ public sealed class EmailChangeRequestedEmailConsumer(
     public async Task Consume(ConsumeContext<EmailChangeRequestedContract> context)
     {
         var message = context.Message;
-        
-        logger.LogInformation("Sending email change verification email to {Email} from IP {IpAddress} at {RequestedAt}", 
-            message.CurrentEmail, message.IpAddress, message.RequestedAt); 
-        
+
+        logger.LogInformation("Sending email change verification email to {Email} from IP {IpAddress} at {RequestedAt}",
+            message.CurrentEmail, message.IpAddress, message.RequestedAt);
+
         try
         {
             var htmlContent = emailTemplateService.CreateEmailChangeVerificationTemplate(
@@ -29,7 +29,7 @@ public sealed class EmailChangeRequestedEmailConsumer(
                 message.IpAddress,
                 message.UserAgent,
                 message.RequestedAt);
-            
+
             var request = new SendEmailRequest
             {
                 Source = $"{emailSettings.Value.SenderName} <{emailSettings.Value.SenderEmail}>",
@@ -46,15 +46,15 @@ public sealed class EmailChangeRequestedEmailConsumer(
                     }
                 }
             };
-            
+
             await simpleEmailService.SendEmailAsync(request, context.CancellationToken);
-            
-            logger.LogInformation("Email change verification email sent successfully to {Email}", 
+
+            logger.LogInformation("Email change verification email sent successfully to {Email}",
                 message.CurrentEmail);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email change verification email to {Email}", 
+            logger.LogError(ex, "Failed to send email change verification email to {Email}",
                 message.CurrentEmail);
             throw;
         }

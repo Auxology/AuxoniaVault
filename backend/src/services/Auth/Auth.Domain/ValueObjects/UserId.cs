@@ -13,21 +13,21 @@ public readonly record struct UserId
         "UserId.StringRequired",
         "UserId requires a non-empty string that can be parsed as a valid GUID."
     );
-    
+
     public Guid Value { get; }
 
     private UserId(Guid value)
     {
         Value = value;
     }
-    
+
     public static UserId New() => new(Guid.NewGuid());
 
     public static Result<UserId> FromGuid(Guid value)
     {
         if (value == Guid.Empty)
             return Result.Failure<UserId>(Invalid);
-        
+
         return Result.Success(new UserId(value));
     }
 
@@ -37,18 +37,18 @@ public readonly record struct UserId
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<UserId>(StringRequired);
-        
+
         if (!Guid.TryParse(value, out var guid) || guid == Guid.Empty)
             return Result.Failure<UserId>(Invalid);
-        
+
         return Result.Success(FromGuid(guid).Value);
     }
-    
+
     public override string ToString() => Value.ToString();
-    
+
     public bool IsEmpty() => Value == Guid.Empty;
-    
+
     public static implicit operator Guid(UserId userId) => userId.Value;
-    
+
     public static implicit operator UserId(Guid value) => FromGuid(value).Value;
 }

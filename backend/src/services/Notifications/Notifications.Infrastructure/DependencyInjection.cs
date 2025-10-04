@@ -19,13 +19,13 @@ public static class DependencyInjection
         services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
         services.AddAWSService<IAmazonSimpleEmailService>();
-        
+
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.ConfigurationSectionName));
         services.AddScoped<EmailTemplateService>();
-        
+
         return services;
     }
-    
+
     private static IServiceCollection AddMassTransit(this IServiceCollection services, IConfiguration configuration)
     {
         var rabbitMqHost = configuration["RabbitMQ:Host"];
@@ -34,13 +34,13 @@ public static class DependencyInjection
         var rabbitMqPassword = configuration["RabbitMQ:Password"];
 
         if (string.IsNullOrEmpty(rabbitMqUsername) || string.IsNullOrEmpty(rabbitMqPassword) ||
-            string.IsNullOrEmpty(rabbitMqHost) || string.IsNullOrEmpty(rabbitMqPort)) 
+            string.IsNullOrEmpty(rabbitMqHost) || string.IsNullOrEmpty(rabbitMqPort))
             throw new InvalidOperationException("RabbitMQ credentials are not configured properly.");
 
         services.AddMassTransit(x =>
         {
             x.AddConsumers(typeof(DependencyInjection).Assembly);
-            
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(rabbitMqHost, ushort.Parse(rabbitMqPort), "/", h =>
@@ -52,7 +52,7 @@ public static class DependencyInjection
                 cfg.ConfigureEndpoints(context);
             });
         });
-        
+
         return services;
     }
 }

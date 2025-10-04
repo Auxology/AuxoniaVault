@@ -23,16 +23,16 @@ internal sealed class SetProfilePictureCommandHandler(
 
         var user = await context.Users
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        
+
         if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
-        
+
         var key = await storageServices.PutObjectAsync(request.File, cancellationToken);
-        
+
         user.SetProfilePicture(key, dateTimeProvider);
-        
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success();
     }
 }

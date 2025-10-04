@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Auth.Application.Users.EmailChangeVerifyNew;
 
-internal sealed class EmailChangeVerifyNewCommandValidator: AbstractValidator<EmailChangeVerifyNewCommand>
+internal sealed class EmailChangeVerifyNewCommandValidator : AbstractValidator<EmailChangeVerifyNewCommand>
 {
     public EmailChangeVerifyNewCommandValidator()
     {

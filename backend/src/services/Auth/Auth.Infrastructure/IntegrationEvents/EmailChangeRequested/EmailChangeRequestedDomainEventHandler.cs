@@ -12,7 +12,7 @@ internal sealed class EmailChangeRequestedDomainEventHandler(IPublishEndpoint pu
     public async Task Handle(DomainEventNotification<EmailChangeRequestedDomainEvent> notification, CancellationToken cancellationToken)
     {
         var domainEvent = notification.Event;
-        
+
         var contract = new EmailChangeRequestedContract
         (
             domainEvent.CurrentEmail,
@@ -23,9 +23,9 @@ internal sealed class EmailChangeRequestedDomainEventHandler(IPublishEndpoint pu
         );
 
         logger.LogInformation("Publishing {Contract} for {Email}", nameof(EmailChangeRequestedContract), domainEvent.CurrentEmail);
-        
+
         await publishEndpoint.Publish(contract, cancellationToken);
-        
+
         logger.LogInformation("Published {Contract} for {Email}", nameof(EmailChangeRequestedContract), domainEvent.CurrentEmail);
     }
 }

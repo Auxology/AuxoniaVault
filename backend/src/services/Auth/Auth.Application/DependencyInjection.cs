@@ -10,7 +10,7 @@ public static class DependencyInjection
         services
             .AddMediatR()
             .AddFluentValidation();
-    
+
     private static IServiceCollection AddMediatR(this IServiceCollection services)
     {
         services.AddMediatR(cfg =>
@@ -21,14 +21,14 @@ public static class DependencyInjection
             cfg.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
             cfg.AddOpenBehavior(typeof(ExceptionPipelineBehavior<,>));
         });
-        
+
         return services;
     }
-    
+
     private static IServiceCollection AddFluentValidation(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
-        
+
         return services;
     }
 }

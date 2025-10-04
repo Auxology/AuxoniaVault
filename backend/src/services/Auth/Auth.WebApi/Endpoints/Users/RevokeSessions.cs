@@ -8,7 +8,7 @@ namespace Auth.WebApi.Endpoints.Users;
 internal sealed class RevokeSessions : IEndpoint
 {
     private sealed record Request(string RefreshToken);
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete("api/auth/users/revoke-sessions", async

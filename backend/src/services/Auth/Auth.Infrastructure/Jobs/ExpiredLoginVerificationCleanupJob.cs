@@ -16,10 +16,10 @@ internal sealed class ExpiredLoginVerificationCleanupJob(IAuthDbContext dbContex
             var deletedCount = await dbContext.LoginVerifications
                 .Where(lv => lv.ExpiresAt <= utcNow)
                 .ExecuteDeleteAsync();
-            
+
             logger.LogInformation("Expired login verification cleanup job completed. Deleted {DeletedCount} expired login verifications.", deletedCount);
         }
-        
+
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while executing the expired login verification cleanup job.");

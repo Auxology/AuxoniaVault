@@ -8,7 +8,7 @@ namespace Auth.WebApi.Endpoints.Users;
 internal sealed class ChangeName : IEndpoint
 {
     private sealed record Request(string Name);
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("/api/auth/change-name", async

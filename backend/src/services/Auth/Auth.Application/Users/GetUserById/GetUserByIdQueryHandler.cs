@@ -14,10 +14,10 @@ internal sealed class GetUserByIdQueryHandler(IAuthDbContext context, IUserConte
     public async Task<Result<UserResponse>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
         UserId userId = UserId.UnsafeFromGuid(userContext.UserId);
-        
+
         if (request.UserId != userContext.UserId)
             return Result.Failure<UserResponse>(UserErrors.Unauthorized());
-        
+
         UserResponse? user = await context.Users
             .Where(u => u.Id == userId)
             .Select(u => new UserResponse
@@ -28,10 +28,10 @@ internal sealed class GetUserByIdQueryHandler(IAuthDbContext context, IUserConte
                 Avatar = u.Avatar
             })
             .SingleOrDefaultAsync(cancellationToken);
-        
+
         if (user is null)
             return Result.Failure<UserResponse>(UserErrors.UserNotFound);
-        
+
         return Result.Success(user);
     }
 }

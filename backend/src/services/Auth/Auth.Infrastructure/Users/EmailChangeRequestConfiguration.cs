@@ -17,7 +17,7 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
             .ValueGeneratedOnAdd()
             .HasColumnType("bigint")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.UserId)
             .HasConversion
             (
@@ -26,7 +26,7 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
             )
             .HasColumnType("uuid")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.CurrentEmail)
             .HasMaxLength(UserConstants.MaxEmailLength)
             .HasConversion(
@@ -45,33 +45,33 @@ internal sealed class EmailChangeRequestConfiguration : IEntityTypeConfiguration
             )
             .HasColumnType("citext")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.CurrentEmailOtp)
             .HasColumnType("text")
             .IsRequired(false);
-        
+
         b.Property(ecr => ecr.NewEmailOtp)
             .HasColumnType("text")
             .IsRequired(false);
-        
+
         b.Property(ecr => ecr.RequestedAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.ExpiresAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.Method)
             .HasConversion<string>()
             .HasColumnType("varchar")
             .IsRequired();
-        
+
         b.Property(ecr => ecr.CurrentStep)
             .HasConversion<string>()
             .HasColumnType("varchar")
             .IsRequired();
-        
+
         b.HasOne<User>()
             .WithMany(u => u.EmailChangeRequests)
             .HasForeignKey(ecr => ecr.UserId)

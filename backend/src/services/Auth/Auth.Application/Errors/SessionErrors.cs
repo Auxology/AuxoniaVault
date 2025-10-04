@@ -9,19 +9,19 @@ internal static class SessionErrors
         "Sessions.RefreshTokenExpired",
         "The provided refresh token is expired."
     );
-    
+
     public static Error UserNotFound => Error.NotFound
     (
         "Sessions.UserNotFound",
         "The user associated with the session was not found."
     );
-    
+
     public static Error SessionNotFound => Error.NotFound
     (
         "Sessions.SessionNotFound",
         "The session with the provided refresh token was not found."
     );
-    
+
     public static Error UnauthorizedAccess => Error.Unauthorized
     (
         "Sessions.UnauthorizedAccess",

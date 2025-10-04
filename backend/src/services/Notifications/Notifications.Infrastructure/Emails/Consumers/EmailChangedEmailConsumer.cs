@@ -17,16 +17,16 @@ public sealed class EmailChangedEmailConsumer(
     public async Task Consume(ConsumeContext<EmailChangedContract> context)
     {
         var message = context.Message;
-        
-        logger.LogInformation("Sending email changed notification to {Email} for User {UserId} at {ChangedAt}", 
-            message.NewEmail, message.UserId, message.ChangedAt); 
-        
+
+        logger.LogInformation("Sending email changed notification to {Email} for User {UserId} at {ChangedAt}",
+            message.NewEmail, message.UserId, message.ChangedAt);
+
         try
         {
             var htmlContent = emailTemplateService.CreateEmailChangedNotificationTemplate(
                 message.NewEmail,
                 message.ChangedAt);
-            
+
             var request = new SendEmailRequest
             {
                 Source = $"{emailSettings.Value.SenderName} <{emailSettings.Value.SenderEmail}>",
@@ -43,15 +43,15 @@ public sealed class EmailChangedEmailConsumer(
                     }
                 }
             };
-            
+
             await simpleEmailService.SendEmailAsync(request, context.CancellationToken);
-            
-            logger.LogInformation("Email changed notification sent successfully to {Email} for User {UserId}", 
+
+            logger.LogInformation("Email changed notification sent successfully to {Email} for User {UserId}",
                 message.NewEmail, message.UserId);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email changed notification to {Email} for User {UserId}", 
+            logger.LogError(ex, "Failed to send email changed notification to {Email} for User {UserId}",
                 message.NewEmail, message.UserId);
             throw;
         }

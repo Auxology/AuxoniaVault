@@ -10,7 +10,7 @@ public static class CustomResults
     {
         if (result.IsSuccess)
             throw new InvalidOperationException("Cannot create a problem result from a successful result.");
-        
+
         return Results.Problem(
             type: GetType(result.Error.Type),
             title: GetTitle(result.Error),
@@ -18,7 +18,7 @@ public static class CustomResults
             instance: GetInstance(httpContext),
             statusCode: GetStatusCode(result.Error.Type),
             extensions: GetExtensions(httpContext));
-        
+
         static string GetType(ErrorType errorType) =>
             errorType switch
             {
@@ -29,7 +29,7 @@ public static class CustomResults
                 ErrorType.Unauthorized => "https://tools.ietf.org/html/rfc7235#section-3.1",
                 _ => "https://tools.ietf.org/html/rfc7231#section-6.6.1"
             };
-        
+
         static string GetTitle(Error error) =>
             error.Type switch
             {
@@ -40,7 +40,7 @@ public static class CustomResults
                 ErrorType.Unauthorized => error.Code,
                 _ => "Server failure"
             };
-        
+
         static string GetDetail(Error error) =>
             error.Type switch
             {
@@ -51,11 +51,11 @@ public static class CustomResults
                 ErrorType.Unauthorized => error.Description,
                 _ => "An unexpected error occurred"
             };
-        
+
         static string GetInstance(HttpContext httpContext) =>
             $"{httpContext.Request.Method}:{httpContext.Request.Path}";
-        
-        
+
+
         static int GetStatusCode(ErrorType errorType) =>
             errorType switch
             {
@@ -68,7 +68,7 @@ public static class CustomResults
         static Dictionary<string, object?> GetExtensions(HttpContext httpContext)
         {
             Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
-            
+
             return new Dictionary<string, object?>
             {
                 ["requestId"] = httpContext.TraceIdentifier,

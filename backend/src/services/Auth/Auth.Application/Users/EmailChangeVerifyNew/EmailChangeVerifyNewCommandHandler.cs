@@ -25,18 +25,18 @@ internal sealed class EmailChangeVerifyNewCommandHandler(IAuthDbContext context,
             return Result.Failure(UserErrors.UserNotFound);
 
         Result verifyResult = user.VerifyNewEmail(request.NewOtp, dateTimeProvider);
-        
+
         if (verifyResult.IsFailure)
             return Result.Failure(verifyResult.Error);
-        
+
         var userSessions = await context.Sessions
             .Where(s => s.UserId == userId)
             .ToListAsync(cancellationToken);
 
         context.Sessions.RemoveRange(userSessions);
-        
+
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return Result.Success();
     }
 }

@@ -15,15 +15,15 @@ internal sealed class GlobalExceptionHandler(IProblemDetailsService problemDetai
             ValidationException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
-        
+
         Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
-        
+
         var title = exception switch
         {
             ValidationException => "One or more validation errors occurred.",
             _ => "An unexpected error occurred."
         };
-        
+
         var type = exception switch
         {
             ValidationException => "https://tools.ietf.org/html/rfc7231#section-6.5.1",

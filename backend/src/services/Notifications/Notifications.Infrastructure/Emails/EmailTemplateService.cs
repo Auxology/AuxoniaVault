@@ -10,7 +10,7 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
     {
         var expirationTime = requestedAt.AddMinutes(_settings.TokenExpirationMinutes);
         var formattedTime = expirationTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
-        
+
         return $@"
 <!DOCTYPE html>
 <html lang=""en"">
@@ -148,7 +148,7 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
     {
         var expirationTime = requestedAt.AddMinutes(_settings.TokenExpirationMinutes);
         var formattedTime = expirationTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
-        
+
         return $@"
 <!DOCTYPE html>
 <html lang=""en"">
@@ -333,7 +333,7 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
     {
         var expirationTime = requestedAt.AddMinutes(_settings.TokenExpirationMinutes);
         var formattedTime = expirationTime.ToString("yyyy-MM-dd HH:mm:ss UTC");
-        
+
         return $@"
 <!DOCTYPE html>
 <html lang=""en"">

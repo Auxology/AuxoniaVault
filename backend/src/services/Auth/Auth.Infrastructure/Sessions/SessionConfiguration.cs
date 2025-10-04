@@ -20,7 +20,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             )
             .HasColumnType("uuid")
             .IsRequired();
-        
+
         b.Property(s => s.UserId)
             .HasConversion(
                 id => id.Value,
@@ -28,33 +28,33 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             )
             .HasColumnType("uuid")
             .IsRequired();
-        
+
         b.Property(s => s.Token)
             .HasColumnType("text")
             .IsRequired();
-        
+
         b.Property(s => s.IpAddress)
             .HasMaxLength(SessionConstants.MaxIpLength)
             .HasColumnType("text")
             .IsRequired();
-        
+
         b.Property(s => s.UserAgent)
             .HasMaxLength(SessionConstants.MaxUserAgentLength)
             .HasColumnType("text")
             .IsRequired();
-        
+
         b.Property(s => s.CreatedAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(s => s.ExpiresAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(s => s.RevokedAt)
             .HasColumnType("timestamptz")
             .IsRequired(false);
-        
+
         b.Property(s => s.Status)
             .HasConversion<string>()
             .HasColumnType("varchar")

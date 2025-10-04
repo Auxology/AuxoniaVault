@@ -13,13 +13,13 @@ internal sealed class LoggingPipelineBehavior<TRequest, TResponse>(
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         string requestName = typeof(TRequest).Name;
-        
+
         logger.LogInformation("Auth Service - Processing request {Request} at {Time}", requestName, dateTimeProvider.UtcNow);
-        
+
         DateTimeOffset startTime = dateTimeProvider.UtcNow;
-        
+
         TResponse response = await next(cancellationToken);
-        
+
         DateTimeOffset endTime = dateTimeProvider.UtcNow;
         TimeSpan duration = endTime - startTime;
 
@@ -38,7 +38,7 @@ internal sealed class LoggingPipelineBehavior<TRequest, TResponse>(
             logger.LogInformation("Auth Service - Completed request {Request} at {Time} (Duration: {Duration} ms)",
                 requestName, dateTimeProvider.UtcNow, duration.TotalMilliseconds);
         }
-        
+
         return response;
     }
 }

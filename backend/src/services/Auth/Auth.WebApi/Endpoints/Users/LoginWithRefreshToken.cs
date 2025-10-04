@@ -1,5 +1,6 @@
 using Auth.Application.Abstractions.LoggingInfo;
 using Auth.Application.Users.LoginWithRefreshToken;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -7,34 +8,40 @@ namespace Auth.WebApi.Endpoints.Users;
 
 internal sealed class LoginWithRefreshToken : IEndpoint
 {
-    private sealed record Request(string RefreshToken);
-
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("api/auth/refresh-token", async
-                (
-                    Request request,
-                    HttpContext httpContext,
-                    ISender sender
-                )
-                =>
+        (
+            HttpContext httpContext,
+            ISender sender
+        )
+        =>
+        {
+            var requestMetadata = httpContext.GetRequestMetadata();
+            
+            string? refreshToken = httpContext.GetRefreshTokenFromCookie();
+            
+            if (string.IsNullOrWhiteSpace(refreshToken))
             {
-                string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
-                                   ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                                   ?? httpContext.Request.Headers["X-Real-IP"].FirstOrDefault()
-                                   ?? "unknown";
+                httpContext.RemoveAuthenticationCookie();
+                return Results.Unauthorized();
+            }
 
-                string userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
+            var command = new LoginWithRefreshTokenCommand(refreshToken, requestMetadata);
 
-                var requestMetadata = new RequestMetadata(ipAddress, userAgent);
+            var result = await sender.Send(command);
 
-                var command = new LoginWithRefreshTokenCommand(request.RefreshToken, requestMetadata);
+            if (result.IsFailure)
+            {
+                httpContext.RemoveAuthenticationCookie();
+                return CustomResults.Problem(result, httpContext);
+            }
 
-                var result = await sender.Send(command);
+            httpContext.SetAuthenticationCookie(result.Value.RefreshToken);
 
-                return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+            return Results.Ok(new { accessToken = result.Value.AccessToken });
 
-            })
-            .WithTags(Tags.Users);
+        })
+        .WithTags(Tags.Users);
     }
 }

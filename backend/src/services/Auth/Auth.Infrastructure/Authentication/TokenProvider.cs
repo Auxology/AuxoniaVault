@@ -15,9 +15,9 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
     {
         string secretKey = configuration["Jwt:Secret"]!;
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-        
+
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(
@@ -30,9 +30,9 @@ internal sealed class TokenProvider(IConfiguration configuration) : ITokenProvid
             Issuer = configuration["Jwt:Issuer"],
             Audience = configuration["Jwt:Audience"]
         };
-        
+
         var handler = new JsonWebTokenHandler();
-        
+
         string token = handler.CreateToken(tokenDescriptor);
 
         return token;

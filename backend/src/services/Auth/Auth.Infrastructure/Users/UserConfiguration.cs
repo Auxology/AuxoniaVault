@@ -20,12 +20,12 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             )
             .HasColumnType("uuid")
             .IsRequired();
-        
+
         b.Property(u => u.Name)
             .HasMaxLength(UserConstants.MaxNameLength)
             .HasColumnType("varchar")
             .IsRequired();
-        
+
         b.Property(u => u.Email)
             .HasMaxLength(UserConstants.MaxEmailLength)
             .HasConversion(
@@ -34,22 +34,22 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             )
             .HasColumnType("citext")
             .IsRequired();
-        
+
         b.Property(u => u.Avatar)
             .HasColumnType("text")
             .IsRequired(false);
-        
+
         b.Property(u => u.CreatedAt)
             .HasColumnType("timestamptz")
             .IsRequired();
-        
+
         b.Property(u => u.UpdatedAt)
             .HasColumnType("timestamptz")
             .IsRequired(false);
-        
+
         b.HasIndex(u => u.Email)
             .IsUnique();
-        
+
         b.ToTable(t =>
         {
             t.HasCheckConstraint("chk_user_id_not_empty",
@@ -61,7 +61,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             t.HasCheckConstraint("chk_user_name_not_empty",
                 "name IS NOT NULL AND length(trim(name)) > 0");
         });
-        
+
         b.Navigation(u => u.EmailChangeRequests).AutoInclude(false);
     }
 }

@@ -39,13 +39,13 @@ public static class DependencyInjection
             .AddStorage(configuration)
             .AddMassTransit(configuration)
             .AddConsumers();
-    
+
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        
+
         services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
-        
+
         services.AddQuartz(configure =>
         {
             var jobKey = new JobKey("ExpiredSessionCleanup");
@@ -68,10 +68,10 @@ public static class DependencyInjection
                         .WithCronSchedule("0 */30 * * * ?")
                         .WithDescription("Cleanup expired login verification codes"));
         });
-        
+
         return services;
     }
-    
+
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -85,9 +85,9 @@ public static class DependencyInjection
 
             options.UseSnakeCaseNamingConvention();
         });
-        
+
         services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
-        
+
         return services;
     }
 
@@ -112,14 +112,14 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<ISecretHasher, SecretHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
-        
+
         return services;
     }
-    
+
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
         services.AddAuthorization();
-        
+
         return services;
     }
 
@@ -131,13 +131,13 @@ public static class DependencyInjection
         var rabbitMqPassword = configuration["RabbitMQ:Password"];
 
         if (string.IsNullOrEmpty(rabbitMqUsername) || string.IsNullOrEmpty(rabbitMqPassword) ||
-            string.IsNullOrEmpty(rabbitMqHost) || string.IsNullOrEmpty(rabbitMqPort)) 
+            string.IsNullOrEmpty(rabbitMqHost) || string.IsNullOrEmpty(rabbitMqPort))
             throw new InvalidOperationException("RabbitMQ credentials are not configured properly.");
 
         services.AddMassTransit(x =>
         {
             x.AddConsumers(typeof(DependencyInjection).Assembly);
-            
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(rabbitMqHost, ushort.Parse(rabbitMqPort), "/", h =>
@@ -149,7 +149,7 @@ public static class DependencyInjection
                 cfg.ConfigureEndpoints(context);
             });
         });
-        
+
         return services;
     }
 
@@ -157,16 +157,16 @@ public static class DependencyInjection
     {
         services.AddTransient<INotificationHandler<DomainEventNotification<LoginRequestedDomainEvent>>,
             LoginRequestedDomainEventHandler>();
-        
+
         services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangeRequestedDomainEvent>>,
             EmailChangeRequestedDomainEventHandler>();
-        
+
         services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangeCurrentEmailVerifiedDomainEvent>>,
             EmailChangeCurrentEmailVerifiedDomainEventHandler>();
-        
+
         services.AddTransient<INotificationHandler<DomainEventNotification<EmailChangedDomainEvent>>,
             EmailChangedDomainEventHandler>();
-        
+
         return services;
     }
 
@@ -177,17 +177,17 @@ public static class DependencyInjection
         services.AddSingleton<IAmazonS3>(sp =>
         {
             var s3Settings = sp.GetRequiredService<IOptions<S3Settings>>().Value;
-            
+
             var config = new AmazonS3Config
             {
                 RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(s3Settings.RegionName)
             };
-            
+
             return new AmazonS3Client(config);
         });
 
         services.AddScoped<IStorageServices, StorageServices>();
-        
+
         return services;
     }
 }

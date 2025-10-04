@@ -9,13 +9,13 @@ internal static class SessionErrors
         "Sessions.UserIdRequired",
         "UserId is required."
     );
-    
+
     public static Error TokenRequired => Error.Validation
     (
         "Sessions.TokenRequired",
         "Token is required."
     );
-    
+
     public static Error InfoRequired => Error.Validation
     (
         "Sessions.InfoRequired",

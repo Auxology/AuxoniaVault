@@ -24,11 +24,11 @@ internal sealed class RevokeSessionsCommandHandler(IAuthDbContext context, IUser
             return Result.Failure(SessionErrors.RefreshTokenExpired);
 
         UserId userId = UserId.UnsafeFromGuid(userContext.UserId);
-        
+
         if (currentSession.UserId != userId)
             return Result.Failure(SessionErrors.UnauthorizedAccess);
-        
-        
+
+
 
         return Result.Success();
     }

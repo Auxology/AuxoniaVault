@@ -26,17 +26,17 @@ internal sealed class ExpiredSessionCleanupJob(IAuthDbContext dbContext, ILogger
 
                 if (!expiredSessionIds.Any())
                     break;
-                
+
                 await dbContext.Sessions
                     .Where(s => expiredSessionIds.Contains(s.Id))
                     .ExecuteDeleteAsync();
-                
+
                 totalDeleted += expiredSessionIds.Count;
                 logger.LogInformation("Deleted {Count} expired sessions in this batch.", expiredSessionIds.Count);
-                
+
                 await Task.Delay(100);
             }
-            
+
             logger.LogInformation("Expired session cleanup job completed. Total deleted sessions: {TotalDeleted}", totalDeleted);
         }
         catch (Exception ex)
