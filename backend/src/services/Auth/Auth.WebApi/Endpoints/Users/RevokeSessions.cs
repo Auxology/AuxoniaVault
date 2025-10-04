@@ -1,4 +1,5 @@
 using Auth.Application.Users.RevokeSessions;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ internal sealed class RevokeSessions : IEndpoint
 
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
         })
-        .WithTags(Tags.Users)
-        .RequireAuthorization();
+        .RequireAuthentication()
+        .WithTags(Tags.Users);
     }
 }

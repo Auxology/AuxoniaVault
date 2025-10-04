@@ -1,4 +1,5 @@
 using Auth.Application.Users.SetProfilePicture;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +25,8 @@ internal sealed class SetProfilePicture : IEndpoint
 
                 return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, context);
             })
+            .RequireAuthentication()
             .WithTags(Tags.Users)
-            .RequireAuthorization()
             .DisableAntiforgery();
     }
 }

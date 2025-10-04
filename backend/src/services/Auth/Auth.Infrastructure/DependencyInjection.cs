@@ -34,8 +34,6 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
-            .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal()
             .AddStorage(configuration)
             .AddMassTransit(configuration)
             .AddConsumers();
@@ -45,6 +43,11 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
+        
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
+        services.AddSingleton<ISecretHasher, SecretHasher>();
+        services.AddSingleton<ITokenProvider, TokenProvider>();
 
         services.AddQuartz(configure =>
         {

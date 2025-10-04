@@ -25,8 +25,4 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 
-app.UseAuthentication();
-
-app.UseAuthorization();
-
 await app.RunAsync();

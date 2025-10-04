@@ -1,4 +1,5 @@
 using Auth.Application.Users.GetUser;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -16,7 +17,7 @@ internal sealed class GetUserById : IEndpoint
 
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, context);
         })
-        .WithTags(Tags.Users)
-        .RequireAuthorization();
+        .RequireAuthentication()
+        .WithTags(Tags.Users);
     }
 }

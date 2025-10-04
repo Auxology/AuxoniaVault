@@ -30,7 +30,7 @@ internal sealed class Logout : IEndpoint
 
             return Results.Ok();
         })
-        .WithTags(Tags.Users)
-        .RequireAuthorization();
+        .RequireAuthentication()
+        .WithTags(Tags.Users);
     }
 }
