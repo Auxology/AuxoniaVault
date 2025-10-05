@@ -25,7 +25,7 @@ internal sealed class EmailChangeVerifyNew : IEndpoint
 
                 return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
             })
-            .RequireAuthentication()
+            .RequireAuthorization()
             .WithTags(Tags.Users);
     }
 }

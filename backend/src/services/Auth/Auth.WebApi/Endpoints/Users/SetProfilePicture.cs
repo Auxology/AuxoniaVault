@@ -25,7 +25,7 @@ internal sealed class SetProfilePicture : IEndpoint
 
                 return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, context);
             })
-            .RequireAuthentication()
+            .RequireAuthorization()
             .WithTags(Tags.Users)
             .DisableAntiforgery();
     }

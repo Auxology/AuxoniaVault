@@ -17,7 +17,7 @@ internal sealed class GetUserById : IEndpoint
 
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, context);
         })
-        .RequireAuthentication()
+        .RequireAuthorization()
         .WithTags(Tags.Users);
     }
 }

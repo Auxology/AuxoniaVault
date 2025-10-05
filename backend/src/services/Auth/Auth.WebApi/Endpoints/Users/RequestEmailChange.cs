@@ -28,7 +28,7 @@ internal sealed class RequestEmailChange : IEndpoint
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
 
         })
-        .RequireAuthentication()
+        .RequireAuthorization()
         .WithTags(Tags.Users);
     }
 }

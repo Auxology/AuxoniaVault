@@ -36,7 +36,9 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddStorage(configuration)
             .AddMassTransit(configuration)
-            .AddConsumers();
+            .AddConsumers()
+            .AddAuthenticationInternal(configuration)
+            .AddAuthorizationInternal();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -44,11 +46,6 @@ public static class DependencyInjection
 
         services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
         
-        services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
-        services.AddSingleton<ISecretHasher, SecretHasher>();
-        services.AddSingleton<ITokenProvider, TokenProvider>();
-
         services.AddQuartz(configure =>
         {
             var jobKey = new JobKey("ExpiredSessionCleanup");

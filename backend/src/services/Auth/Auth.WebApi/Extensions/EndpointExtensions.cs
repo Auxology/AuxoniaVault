@@ -7,10 +7,6 @@ namespace Auth.WebApi.Extensions;
 
 public static class EndpointExtensions
 {
-    public static RouteHandlerBuilder RequireAuthentication(this RouteHandlerBuilder builder)
-    {
-        return builder.AddEndpointFilter<RequireAuthenticationFilter>();
-    }
     public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
     {
         ServiceDescriptor[] serviceDescriptors = assembly

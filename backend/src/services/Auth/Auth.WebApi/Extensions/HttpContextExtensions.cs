@@ -45,10 +45,4 @@ public static class HttpContextExtensions
     
     public static string? GetRefreshTokenFromCookie(this HttpContext httpContext)
         => httpContext.Request.Cookies["refreshToken"];
-    
-    public static string? GetUserIdFromGateway(this HttpContext context)
-        => context.Request.Headers["X-User-Id"].FirstOrDefault();
-
-    public static string? GetUserEmailFromGateway(this HttpContext context)
-        => context.Request.Headers["X-User-Email"].FirstOrDefault();
 }
