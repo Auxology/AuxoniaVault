@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Billing.Application\Billing.Application.csproj" />
+      <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
+      <ProjectReference Include="..\Billing.SharedKernel\Billing.SharedKernel.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
+      <PackageReference Include="MassTransit" Version="8.5.4" />
+      <PackageReference Include="MassTransit.Abstractions" Version="8.5.4" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+      <PackageReference Include="Stripe.net" Version="49.0.0" />
+    </ItemGroup>
+
+</Project>
