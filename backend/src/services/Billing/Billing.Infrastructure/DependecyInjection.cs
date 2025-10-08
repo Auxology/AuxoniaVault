@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 
 namespace Billing.Infrastructure;
 
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services
             .AddServices()
             .AddDatabase(configuration)
+            .AddStripe(configuration)
             .AddMassTransit(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
@@ -80,6 +82,20 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
         services.AddAuthorization();
+
+        return services;
+    }
+
+    private static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration configuration)
+    {
+        var stripeApiKey = configuration["Stripe:ApiKey"];
+
+        if (string.IsNullOrEmpty(stripeApiKey))
+            throw new InvalidOperationException("Stripe API key is not configured.");
+
+        StripeConfiguration.ApiKey = stripeApiKey;
+
+        services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
 
         return services;
     }

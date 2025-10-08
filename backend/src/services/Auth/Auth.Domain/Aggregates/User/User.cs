@@ -1,6 +1,7 @@
 using Auth.Domain.Constants;
 using Auth.Domain.Entities;
 using Auth.Domain.Errors;
+using Auth.Domain.Events;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
 
@@ -46,6 +47,8 @@ public class User : Entity, IAggregateRoot
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
         var user = new User(name, email, utcNow);
+
+        user.Raise(new UserCreatedDomainEvent(user.Id.Value, user.Email.Value, user.Name, user.CreatedAt));
 
         return Result.Success(user);
     }

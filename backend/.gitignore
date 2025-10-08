@@ -487,5 +487,5 @@ $RECYCLE.BIN/
 Migrations/
 
 .colorpalatte.md
-compose.yaml
+/compose.yaml
 claudedocs

@@ -1,5 +1,6 @@
 using Billing.Infrastructure.Database;
 using Billing.Application.Abstractions.Database;
+using Billing.Domain.Aggregate.Customer;
 using Billing.Infrastructure.DomainEvents;
 using Billing.SharedKernel;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ public sealed class BillingDbContext(DbContextOptions<BillingDbContext> options,
 
         base.OnModelCreating(modelBuilder);
     }
+
+    public DbSet<Customer> Customers { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

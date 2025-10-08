@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Shared\Shared.csproj" />
       <ProjectReference Include="..\Billing.Application\Billing.Application.csproj" />
       <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
       <ProjectReference Include="..\Billing.SharedKernel\Billing.SharedKernel.csproj" />
