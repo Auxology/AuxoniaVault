@@ -22,6 +22,8 @@ public class User : Entity, IAggregateRoot
     public DateTimeOffset? UpdatedAt { get; private set; }
 
     public virtual ICollection<EmailChangeRequest> EmailChangeRequests { get; private set; }
+    
+    public virtual ICollection<UserRecoveryCode> RecoveryCodes { get; private set; }
 
     private User() { } // For EF Core
 
@@ -34,6 +36,7 @@ public class User : Entity, IAggregateRoot
         Avatar = null;
         UpdatedAt = null;
         EmailChangeRequests = [];
+        RecoveryCodes = [];
     }
 
     public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
@@ -49,7 +52,7 @@ public class User : Entity, IAggregateRoot
         var user = new User(name, email, utcNow);
 
         user.Raise(new UserCreatedDomainEvent(user.Id.Value, user.Email.Value, user.Name, user.CreatedAt));
-
+        
         return Result.Success(user);
     }
 
@@ -144,6 +147,30 @@ public class User : Entity, IAggregateRoot
         Email = newEmail;
         UpdatedAt = dateTimeProvider.UtcNow;
 
+        return Result.Success();
+    }
+
+    public Result CreateRecoveryCodes(string[] hashedRecoveryCodes, IDateTimeProvider dateTimeProvider)
+    {
+        if (hashedRecoveryCodes.Length == 0)
+            return Result.Failure(UserRecoveryCodeErrors.HashedCodesRequired);
+        
+        if (hashedRecoveryCodes.Length > UserConstants.MaxRecoveryCodes)
+            return Result.Failure(UserErrors.RecoveryCodesExceedLimit);
+        
+        if (RecoveryCodes.Count > 0)
+            return Result.Failure(UserErrors.RecoveryCodesAlreadyExist);
+
+        foreach (var hashedCode in hashedRecoveryCodes)
+        {
+            var recoveryCodeResult = UserRecoveryCode.Create(Id, hashedCode, dateTimeProvider);
+            
+            if (recoveryCodeResult.IsFailure)
+                return Result.Failure(recoveryCodeResult.Error);
+            
+            RecoveryCodes.Add(recoveryCodeResult.Value);
+        }
+        
         return Result.Success();
     }
 }

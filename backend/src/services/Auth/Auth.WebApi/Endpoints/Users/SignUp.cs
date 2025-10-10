@@ -1,4 +1,3 @@
-using Auth.Application.Users;
 using Auth.Application.Users.SignUp;
 using Auth.SharedKernel;
 using Auth.WebApi.Infrastructure;
@@ -21,7 +20,7 @@ internal sealed class SignUp : IEndpoint
         {
             var command = new SignUpCommand(request.Name, request.Email);
 
-            Result<Guid> result = await sender.Send(command);
+            Result<string[]> result = await sender.Send(command);
 
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
         })

@@ -6,4 +6,4 @@ public record SignUpCommand
 (
     string Name,
     string Email
-) : ICommand<Guid>;
+) : ICommand<string[]>;
