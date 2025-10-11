@@ -206,7 +206,7 @@ public class User : Entity, IAggregateRoot
         if (recoveryRequest.UserId != Id)
             return Result.Failure(UserErrors.RecoveryRequestUserMismatch);
         
-        if (newEmail != Email)
+        if (newEmail == Email)
             return Result.Failure(UserErrors.EmailCannotBeSame);
         
         var completeResult = recoveryRequest.Complete(newEmail.Value, dateTimeProvider);
