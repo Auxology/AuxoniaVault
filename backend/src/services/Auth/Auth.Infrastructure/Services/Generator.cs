@@ -9,6 +9,7 @@ internal sealed class Generator : IGenerator
     private const int RangeStart = 100000;
     private const int RangeEnd = 999999;
     private const int RecoveryCodeByteSize = 16;
+    private const int UniqueIdentifierByteSize = 24;
     private const int RecoveryCodeLimit = UserConstants.MaxRecoveryCodes;
 
     public Task<int> GenerateVerificationCode()
@@ -37,5 +38,17 @@ internal sealed class Generator : IGenerator
             .ToArray();
 
         return await Task.WhenAll(tasks);
+    }
+
+    public Task<string> GenerateUniqueIdentifier()
+    {
+        byte[] randomBytes = RandomNumberGenerator.GetBytes(UniqueIdentifierByteSize);
+        
+        string uniqueIdentifier = Convert.ToBase64String(randomBytes)
+            .Replace('+', '-')
+            .Replace('/', '_')
+            .TrimEnd('=');
+
+        return Task.FromResult(uniqueIdentifier);
     }
 }

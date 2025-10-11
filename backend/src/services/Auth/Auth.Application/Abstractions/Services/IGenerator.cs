@@ -7,4 +7,6 @@ public interface IGenerator
     Task<string> GenerateRecoveryCode();
 
     Task<string[]> GenerateRecoveryCodesAsync();
+    
+    Task<string> GenerateUniqueIdentifier();
 };

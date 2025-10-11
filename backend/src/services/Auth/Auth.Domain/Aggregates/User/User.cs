@@ -24,6 +24,8 @@ public class User : Entity, IAggregateRoot
     public virtual ICollection<EmailChangeRequest> EmailChangeRequests { get; private set; }
     
     public virtual ICollection<UserRecoveryCode> RecoveryCodes { get; private set; }
+    
+    public virtual ICollection<UserRecoveryRequest> RecoveryRequests { get; private set; }
 
     private User() { } // For EF Core
 
@@ -37,6 +39,7 @@ public class User : Entity, IAggregateRoot
         UpdatedAt = null;
         EmailChangeRequests = [];
         RecoveryCodes = [];
+        RecoveryRequests = [];
     }
 
     public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
@@ -171,6 +174,48 @@ public class User : Entity, IAggregateRoot
             RecoveryCodes.Add(recoveryCodeResult.Value);
         }
         
+        return Result.Success();
+    }
+
+    public Result<UserRecoveryRequest> ApproveRecoveryRequest(string uniqueIdentifier, IDateTimeProvider dateTimeProvider)
+    {
+        IEnumerable<UserRecoveryRequest> recoveryRequests = RecoveryRequests.ToList();
+
+        var now = dateTimeProvider.UtcNow;
+        
+        if (recoveryRequests.Count(r => r.ExpiresAt > now && !r.IsCompleted) >= UserConstants.MaxActiveRecoveryRequests)
+            return Result.Failure<UserRecoveryRequest>(UserErrors.TooManyActiveRecoveryRequests);
+        
+        var requestResult = UserRecoveryRequest.Create
+        (
+            uniqueIdentifier,
+            Id,
+            dateTimeProvider
+        );
+
+        if (requestResult.IsFailure)
+            return Result.Failure<UserRecoveryRequest>(requestResult.Error);
+        
+        RecoveryRequests.Add(requestResult.Value);
+        
+        return requestResult;
+    }
+    
+    public Result CompleteRecovery(UserRecoveryRequest recoveryRequest, EmailAddress newEmail, IDateTimeProvider dateTimeProvider)
+    {
+        if (recoveryRequest.UserId != Id)
+            return Result.Failure(UserErrors.RecoveryRequestUserMismatch);
+        
+        if (newEmail != Email)
+            return Result.Failure(UserErrors.EmailCannotBeSame);
+        
+        var completeResult = recoveryRequest.Complete(newEmail.Value, dateTimeProvider);
+        
+        if (completeResult.IsFailure)
+            return Result.Failure(completeResult.Error);
+        
+        UpdatedAt = dateTimeProvider.UtcNow;
+
         return Result.Success();
     }
 }

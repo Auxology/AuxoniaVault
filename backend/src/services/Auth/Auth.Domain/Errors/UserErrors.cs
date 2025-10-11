@@ -40,4 +40,16 @@ internal static class UserErrors
         "Users.RecoveryCodesAlreadyExist",
         "The user already has recovery codes."
     );
+    
+    public static Error RecoveryRequestUserMismatch => Error.Unauthorized
+    (
+        "Users.RecoveryRequestUserMismatch",
+        "The recovery request does not belong to the specified user."
+    );
+    
+    public static Error TooManyActiveRecoveryRequests => Error.Validation
+    (
+        "Users.TooManyActiveRecoveryRequests",
+        $"The user has too many active recovery requests. The limit is {UserConstants.MaxActiveRecoveryRequests}."
+    );
 }

@@ -15,6 +15,8 @@ public interface IAuthDbContext
     DbSet<Session> Sessions { get; }
 
     DbSet<EmailChangeRequest> EmailChangeRequests { get; }
+    
+    DbSet<UserRecoveryRequest> UserRecoveryRequests { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

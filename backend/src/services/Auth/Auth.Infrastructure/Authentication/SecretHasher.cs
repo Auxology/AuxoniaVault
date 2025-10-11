@@ -18,4 +18,9 @@ internal sealed class SecretHasher : ISecretHasher
     {
         return Task.Run(() => Argon2.Verify(hash, secret), cancellationToken);
     }
+
+    public Task<bool> OneToManyVerifyAsync(IEnumerable<string> hashes, string secret, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => hashes.Any(hash => Argon2.Verify(hash, secret)), cancellationToken);
+    }
 }
