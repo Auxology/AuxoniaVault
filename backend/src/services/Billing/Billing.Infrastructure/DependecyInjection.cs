@@ -1,9 +1,12 @@
 using System.Text;
 using Billing.Application.Abstractions.Authentication;
 using Billing.Application.Abstractions.Database;
+using Billing.Application.Abstractions.Services;
 using Billing.Infrastructure.Authentication;
 using Billing.Infrastructure.Database;
 using Billing.Infrastructure.DomainEvents;
+using Billing.Infrastructure.Services;
+using Billing.Infrastructure.Settings;
 using Billing.Infrastructure.Time;
 using Billing.SharedKernel;
 using MassTransit;
@@ -96,6 +99,8 @@ public static class DependencyInjection
         StripeConfiguration.ApiKey = stripeApiKey;
 
         services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
+        services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
+        services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
 
         return services;
     }

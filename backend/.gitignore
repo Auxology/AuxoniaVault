@@ -489,3 +489,6 @@ Migrations/
 .colorpalatte.md
 /compose.yaml
 claudedocs
+
+# Ignore billing api appsettings.json
+src/services/Billing/Billing.WebApi/appsettings.json
