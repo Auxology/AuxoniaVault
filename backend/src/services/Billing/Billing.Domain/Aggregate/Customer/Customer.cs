@@ -57,6 +57,9 @@ public class Customer : Entity, IAggregateRoot
         if (string.IsNullOrWhiteSpace((stripePriceId)))
             return Result.Failure<Subscription>(SubscriptionErrors.StripePriceIdRequired);
         
+        if (Subscriptions is null)
+            Subscriptions = [];
+        
         Subscription? existingSubscription = Subscriptions
             .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
         
@@ -65,6 +68,7 @@ public class Customer : Entity, IAggregateRoot
         
         Result<Subscription> subscriptionResult = Subscription.CreateIncomplete(
             UserId,
+            StripeCustomerId,
             stripeSubscriptionId,
             stripePriceId,
             currentPeriodStart,
@@ -83,6 +87,9 @@ public class Customer : Entity, IAggregateRoot
     public Result ActivateSubscription(string stripeSubscriptionId, DateTimeOffset currentPeriodStart,
         DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
+        if (Subscriptions is null)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+        
         Subscription? subscription = Subscriptions
             .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
 
@@ -110,6 +117,9 @@ public class Customer : Entity, IAggregateRoot
         IDateTimeProvider dateTimeProvider)
 
     {
+        if (Subscriptions is null)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+        
         Subscription? subscription = Subscriptions
             .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
 
@@ -132,6 +142,9 @@ public class Customer : Entity, IAggregateRoot
         string stripeSubscriptionId,
         IDateTimeProvider dateTimeProvider)
     {
+        if (Subscriptions is null)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+        
         Subscription? subscription = Subscriptions
             .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
     

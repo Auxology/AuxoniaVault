@@ -9,5 +9,4 @@ internal static class SubscriptionErrors
         "Subscriptions.ActiveSubscriptionAlreadyExists",
         "Customer already has an active subscription."
     );
-
 }

@@ -25,4 +25,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 
+app.MapControllers();
+
 await app.RunAsync();

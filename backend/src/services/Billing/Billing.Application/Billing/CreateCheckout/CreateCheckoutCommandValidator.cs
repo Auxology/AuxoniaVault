@@ -7,6 +7,7 @@ internal sealed class CreateCheckoutCommandValidator : AbstractValidator<CreateC
     public CreateCheckoutCommandValidator()
     {
         RuleFor(ccc => ccc.PriceId)
-            .NotEmpty().WithMessage("Price Id cannot be empty");
+            .NotEmpty().WithMessage("Price Id cannot be empty")
+            .Matches(@"^price_[a-zA-Z0-9]+$").WithMessage("Price Id is not valid");
     }
 }

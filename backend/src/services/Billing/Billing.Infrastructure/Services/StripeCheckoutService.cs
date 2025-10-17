@@ -48,23 +48,11 @@ internal sealed class StripeCheckoutService(IStripeClient stripeClient, IOptions
         }
         catch (StripeException ex)
         {
-            return Result.Failure<string>(StripeError(ex.StripeError.Code, ex.StripeError.Message));
+            return Result.Failure<string>(StripeErrors.StripeError(ex.StripeError.Code, ex.StripeError.Message));
         }
         catch (Exception ex)
         {
-            return Result.Failure<string>(GeneralError(ex.Message));
+            return Result.Failure<string>(StripeErrors.GeneralError(ex.Message));
         }
     }
-
-    internal static Error StripeError(string code, string message) => Error.Failure
-    (
-        "Stripe.Failure",
-        $"Stripe error ({code}): {message}"
-    );
-    
-    internal static Error GeneralError(string message) => Error.Failure
-    (
-        "Stripe.GeneralFailure",
-        $"General error: {message}"
-    );
 }

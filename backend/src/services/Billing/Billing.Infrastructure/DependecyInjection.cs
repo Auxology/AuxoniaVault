@@ -101,6 +101,7 @@ public static class DependencyInjection
         services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
         services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
         services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
+        services.AddTransient<IStripeWebhookService, StripeWebhookService>();
 
         return services;
     }

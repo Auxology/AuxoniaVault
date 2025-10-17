@@ -34,6 +34,7 @@ public class Subscription : Entity
     private Subscription
     (
         UserId userId,
+        string stripeCustomerId,
         string stripeSubscriptionId,
         string stripePriceId,
         SubscriptionStatus status,
@@ -44,6 +45,7 @@ public class Subscription : Entity
     
     {
         UserId = userId;
+        StripeCustomerId = stripeCustomerId;
         StripeSubscriptionId = stripeSubscriptionId;
         StripePriceId = stripePriceId;
         Status = status;
@@ -54,12 +56,15 @@ public class Subscription : Entity
     }
 
 
-    internal static Result<Subscription> CreateIncomplete(UserId userId, string stripeSubscriptionId,
+    internal static Result<Subscription> CreateIncomplete(UserId userId, string stripeCustomerId, string stripeSubscriptionId,
         string stripePriceId, DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd,
         IDateTimeProvider dateTimeProvider)
     {
         if (userId.IsEmpty())
             return Result.Failure<Subscription>(CustomerErrors.UserIdRequired);
+        
+        if (string.IsNullOrWhiteSpace(stripeCustomerId))
+            return Result.Failure<Subscription>(CustomerErrors.StripeCustomerIdRequired);
         
         if (string.IsNullOrWhiteSpace(stripeSubscriptionId))
             return Result.Failure<Subscription>(SubscriptionErrors.StripeSubscriptionIdRequired);
@@ -71,6 +76,7 @@ public class Subscription : Entity
         
         var subscription = new Subscription(
             userId,
+            stripeCustomerId,
             stripeSubscriptionId,
             stripePriceId,
             SubscriptionStatus.Incomplete,
