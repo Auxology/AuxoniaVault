@@ -57,7 +57,7 @@ public class Customer : Entity, IAggregateRoot
         if (string.IsNullOrWhiteSpace((stripePriceId)))
             return Result.Failure<Subscription>(SubscriptionErrors.StripePriceIdRequired);
         
-        if (Subscriptions is null)
+        if (!Subscriptions.Any())
             Subscriptions = [];
         
         Subscription? existingSubscription = Subscriptions
@@ -87,7 +87,7 @@ public class Customer : Entity, IAggregateRoot
     public Result ActivateSubscription(string stripeSubscriptionId, DateTimeOffset currentPeriodStart,
         DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
-        if (Subscriptions is null)
+        if (!Subscriptions.Any())
             return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
         
         Subscription? subscription = Subscriptions
@@ -111,13 +111,13 @@ public class Customer : Entity, IAggregateRoot
         
         return Result.Success();
     }
-
+    
     public Result UpdateSubscription(string stripeSubscriptionId, SubscriptionStatus newStatus,
         DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd, bool cancelAtPeriodEnd,
         IDateTimeProvider dateTimeProvider)
 
     {
-        if (Subscriptions is null)
+        if (!Subscriptions.Any())
             return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
         
         Subscription? subscription = Subscriptions
@@ -137,30 +137,71 @@ public class Customer : Entity, IAggregateRoot
 
         return Result.Success();
     }
-    
-    public Result CancelSubscription(
+
+    public Result CancelSubscriptionAtPeriodEnd
+    (
         string stripeSubscriptionId,
-        IDateTimeProvider dateTimeProvider)
+        DateTimeOffset currentPeriodEnd,
+        DateTimeOffset currentPeriodStart,
+        IDateTimeProvider dateTimeProvider
+    )
+
     {
-        if (Subscriptions is null)
+        if (!Subscriptions.Any())
             return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
-        
+
         Subscription? subscription = Subscriptions
             .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
-    
+
         if (subscription is null)
             return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
-        
+
         if (subscription.Status != SubscriptionStatus.Active)
             return Result.Failure(SubscriptionErrors.OnlyActiveSubscriptionsCanBeCancelled);
-    
-        Result cancelResult = subscription.Cancel(dateTimeProvider);
-    
+
+        Result cancelResult = subscription.Update
+        (
+            SubscriptionStatus.Active,
+            currentPeriodStart,
+            currentPeriodEnd,
+            cancelAtPeriodEnd: true, 
+            dateTimeProvider
+        );
+        
         if (cancelResult.IsFailure)
             return cancelResult;
         
+        return Result.Success();
+    }
+
+    public Result CompleteSubscriptionCancellation
+    (
+        string stripeSubscriptionId,
+        DateTimeOffset currentPeriodEnd,
+        DateTimeOffset currentPeriodStart,
+        IDateTimeProvider dateTimeProvider
+    )
+
+    {
+        if (!Subscriptions.Any())
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+
+        Subscription? subscription = Subscriptions
+            .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
+
+        if (subscription is null)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+
+        if (subscription.Status != SubscriptionStatus.Active)
+            return Result.Failure(SubscriptionErrors.OnlyActiveSubscriptionsCanBeCancelled);
+
+        Result cancelResult = subscription.Cancel(currentPeriodStart, currentPeriodEnd, dateTimeProvider);
+
+        if (cancelResult.IsFailure)
+            return cancelResult;
+
         // TODO: Raise Domain Event
-        
+
         return Result.Success();
     }
 }

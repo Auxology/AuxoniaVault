@@ -122,13 +122,14 @@ public class Subscription : Entity
         return Result.Success();
     }
 
-    internal Result Cancel(IDateTimeProvider dateTimeProvider)
+    internal Result Cancel(DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
         if (Status != SubscriptionStatus.Active)
             return Result.Failure(SubscriptionErrors.CannotCancelInactiveSubscription);
         
-        Status = SubscriptionStatus.Cancelled;
         CancelAtPeriodEnd = true;
+        CurrentPeriodStart = currentPeriodStart;
+        CurrentPeriodEnd = currentPeriodEnd;
         UpdatedAt = dateTimeProvider.UtcNow;
         
         return Result.Success();
