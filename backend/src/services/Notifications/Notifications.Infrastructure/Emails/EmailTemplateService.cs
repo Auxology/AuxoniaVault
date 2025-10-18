@@ -687,4 +687,183 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
 </body>
 </html>";
     }
+
+    public string CreateSubscriptionActivatedTemplate(string customerName, string customerEmail, string planName, string priceFormatted, DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd)
+    {
+        return $@"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Subscription Activated - {_settings.CompanyName}</title>
+    <style>
+        body {{
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: oklch(0.3211 0 0);
+            background-color: oklch(0.9846 0.0017 247.8389);
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }}
+        .header {{
+            background: oklch(0.5461 0.2152 262.8809);
+            color: oklch(1.0000 0 0);
+            padding: 32px 24px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }}
+        .content {{
+            padding: 32px 24px;
+        }}
+        .success-container {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 2px solid oklch(0.5461 0.2152 262.8809);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+        }}
+        .success-icon {{
+            font-size: 48px;
+            margin-bottom: 16px;
+        }}
+        .info-box {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-left: 4px solid oklch(0.6231 0.1880 259.8145);
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }}
+        .info-box p {{
+            margin: 0;
+            color: oklch(0.3791 0.1378 265.5222);
+        }}
+        .subscription-details {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 1px solid oklch(0.9276 0.0058 264.5313);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .subscription-details h3 {{
+            color: oklch(0.3211 0 0);
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }}
+        .subscription-details p {{
+            color: oklch(0.5510 0.0234 264.3637);
+            margin: 4px 0;
+            font-size: 14px;
+        }}
+        .billing-info {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .billing-info h3 {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .billing-info p {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0;
+            font-size: 14px;
+        }}
+        .features-notice {{
+            background-color: oklch(0.5461 0.2152 262.8809);
+            color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .features-notice h3 {{
+            color: oklch(1.0000 0 0);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .features-notice p {{
+            color: oklch(1.0000 0 0);
+            margin: 0;
+            font-size: 14px;
+        }}
+        .footer {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            padding: 24px;
+            text-align: center;
+            color: oklch(0.5510 0.0234 264.3637);
+            font-size: 14px;
+        }}
+        .footer a {{
+            color: oklch(0.6231 0.1880 259.8145);
+            text-decoration: none;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>🎉 Subscription Activated</h1>
+        </div>
+        
+        <div class=""content"">
+            <h2>Welcome to {_settings.CompanyName} Premium!</h2>
+            <p>Congratulations {customerName}! Your subscription has been successfully activated and you now have access to all premium features.</p>
+            
+            <div class=""success-container"">
+                <div class=""success-icon"">✨</div>
+                <h3>Subscription Active</h3>
+                <p>Your premium subscription is now live and ready to use.</p>
+            </div>
+            
+            <div class=""info-box"">
+                <p><strong>📧 Account:</strong> {customerEmail}</p>
+                <p><strong>🕐 Activated:</strong> {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss UTC}</p>
+            </div>
+            
+            <div class=""subscription-details"">
+                <h3>📋 Subscription Details</h3>
+                <p><strong>Plan:</strong> {planName}</p>
+                <p><strong>Price:</strong> {priceFormatted}</p>
+                <p><strong>Billing Period:</strong> {currentPeriodStart:MMM dd, yyyy} - {currentPeriodEnd:MMM dd, yyyy}</p>
+                <p><strong>Next Billing:</strong> {currentPeriodEnd:MMM dd, yyyy}</p>
+            </div>
+            
+            <div class=""billing-info"">
+                <h3>💳 Billing Information</h3>
+                <p>Your subscription will automatically renew on {currentPeriodEnd:MMM dd, yyyy}. You can manage your subscription and billing preferences in your account settings.</p>
+            </div>
+            
+            <div class=""features-notice"">
+                <h3>🚀 Premium Features Unlocked</h3>
+                <p>You now have access to all premium features including advanced analytics, priority support, and exclusive content. Start exploring your new capabilities!</p>
+            </div>
+            
+            <p>Thank you for choosing {_settings.CompanyName}! We're excited to have you as a premium member.</p>
+        </div>
+        
+        <div class=""footer"">
+            <p>This email was sent to {customerEmail}</p>
+            <p>© {DateTime.UtcNow.Year} {_settings.CompanyName}. All rights reserved.</p>
+            {(!string.IsNullOrEmpty(_settings.SupportEmail) ? $"<p>Need help? Contact us at <a href=\"mailto:{_settings.SupportEmail}\">{_settings.SupportEmail}</a></p>" : "")}
+            {(!string.IsNullOrEmpty(_settings.WebsiteUrl) ? $"<p>Visit our website: <a href=\"{_settings.WebsiteUrl}\">{_settings.WebsiteUrl}</a></p>" : "")}
+        </div>
+    </div>
+</body>
+</html>";
+    }
 }

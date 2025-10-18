@@ -1,5 +1,6 @@
 using Billing.Domain.Entities;
 using Billing.Domain.Errors;
+using Billing.Domain.Events;
 using Billing.Domain.ValueObjects;
 using Billing.SharedKernel;
 
@@ -84,7 +85,7 @@ public class Customer : Entity, IAggregateRoot
         return Result.Success(subscriptionResult.Value);
     }
 
-    public Result ActivateSubscription(string stripeSubscriptionId, DateTimeOffset currentPeriodStart,
+    public Result ActivateSubscription(string stripeSubscriptionId, string planName, string priceFormatted, DateTimeOffset currentPeriodStart,
         DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
         if (!Subscriptions.Any())
@@ -107,7 +108,17 @@ public class Customer : Entity, IAggregateRoot
         if (activationResult.IsFailure)
             return Result.Failure(activationResult.Error);
         
-        // TODO: RAISE DOMAIN EVENT
+        Raise(new SubscriptionActivatedDomainEvent
+        (
+            UserId.Value,
+            StripeCustomerName,
+            StripeCustomerEmail,
+            stripeSubscriptionId,
+            planName,
+            priceFormatted,
+            currentPeriodStart,
+            currentPeriodEnd
+        ));
         
         return Result.Success();
     }

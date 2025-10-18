@@ -9,7 +9,13 @@ using Stripe.Checkout;
 
 namespace Billing.Application.Billing.ProcessWebhook;
 
-internal sealed class ProcessWebhookCommandHandler(IStripeWebhookService webhookService, IBillingDbContext context, IDateTimeProvider dateTimeProvider) : ICommandHandler<ProcessWebhookCommand>
+internal sealed class ProcessWebhookCommandHandler(
+    IStripeWebhookService webhookService, 
+    IBillingDbContext context, 
+    IDateTimeProvider dateTimeProvider,
+    SubscriptionService subscriptionService,
+    ProductService productService,
+    PriceService priceService) : ICommandHandler<ProcessWebhookCommand>
 {
     public async Task<Result> Handle(ProcessWebhookCommand request, CancellationToken cancellationToken)
     {
@@ -37,21 +43,30 @@ internal sealed class ProcessWebhookCommandHandler(IStripeWebhookService webhook
                 return Result.Success();
         
             var customer = await context.Customers
+                .Include(c => c.Subscriptions)
                 .FirstOrDefaultAsync(c => c.StripeCustomerId == session.CustomerId, cancellationToken);
         
             if (customer is null)
                 return Result.Success();
         
-            var subscriptionService = new SubscriptionService();
             var stripeSubscription = await subscriptionService.GetAsync(session.SubscriptionId, cancellationToken: cancellationToken);
         
             var subscriptionItem = stripeSubscription.Items.Data.FirstOrDefault();
         
             if (subscriptionItem is null)
                 return Result.Success();
+            
+            var stripePrice = await priceService.GetAsync(subscriptionItem.Price.Id, cancellationToken: cancellationToken);
+            var stripeProduct = await productService.GetAsync(stripePrice.ProductId, cancellationToken: cancellationToken);
+
+            var planName = stripeProduct.Name;
         
+            var priceAmount = stripePrice.UnitAmount;
+            var currency = stripePrice.Currency;
+            var priceFormatted = $"${priceAmount / 100.0:F2} {currency.ToUpper()}";
+            
             var status = MapStripeStatusToSubscriptionStatus(stripeSubscription.Status);
-        
+            
             DateTimeOffset currentPeriodStart = dateTimeProvider.FromDateTime(subscriptionItem.CurrentPeriodStart);
             DateTimeOffset currentPeriodEnd = dateTimeProvider.FromDateTime(subscriptionItem.CurrentPeriodEnd);
 
@@ -72,6 +87,8 @@ internal sealed class ProcessWebhookCommandHandler(IStripeWebhookService webhook
                 Result activationResult = customer.ActivateSubscription
                 (
                     stripeSubscription.Id,
+                    planName,
+                    priceFormatted,
                     currentPeriodStart,
                     currentPeriodEnd,
                     dateTimeProvider

@@ -14,7 +14,7 @@ internal sealed class LoggingPipelineBehavior<TRequest, TResponse>(
     {
         string requestName = typeof(TRequest).Name;
 
-        logger.LogInformation("Auth Service - Processing request {Request} at {Time}", requestName, dateTimeProvider.UtcNow);
+        logger.LogInformation("Billing Service - Processing request {Request} at {Time}", requestName, dateTimeProvider.UtcNow);
 
         DateTimeOffset startTime = dateTimeProvider.UtcNow;
 
@@ -25,17 +25,17 @@ internal sealed class LoggingPipelineBehavior<TRequest, TResponse>(
 
         if (response is Result { IsSuccess: true })
         {
-            logger.LogInformation("Auth Service - Completed request {Request} at {Time} (Duration: {Duration} ms)",
+            logger.LogInformation("Billing Service - Completed request {Request} at {Time} (Duration: {Duration} ms)",
                 requestName, dateTimeProvider.UtcNow, duration.TotalMilliseconds);
         }
         else if (response is Result { IsFailure: true } result)
         {
-            logger.LogError("Auth Service - Completed request {Request} at {Time} with error (Duration: {Duration} ms). Error: {Error}",
+            logger.LogError("Billing Service - Completed request {Request} at {Time} with error (Duration: {Duration} ms). Error: {Error}",
                 requestName, dateTimeProvider.UtcNow, duration.TotalMilliseconds, result.Error);
         }
         else
         {
-            logger.LogInformation("Auth Service - Completed request {Request} at {Time} (Duration: {Duration} ms)",
+            logger.LogInformation("Billing Service - Completed request {Request} at {Time} (Duration: {Duration} ms)",
                 requestName, dateTimeProvider.UtcNow, duration.TotalMilliseconds);
         }
 

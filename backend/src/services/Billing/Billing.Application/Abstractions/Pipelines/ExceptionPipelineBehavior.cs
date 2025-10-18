@@ -22,7 +22,7 @@ internal sealed class ExceptionPipelineBehavior<TRequest, TResponse>(
             DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
             logger.LogError(exception,
-                "Auth Service - Request {Name} failed at {DateTimeOffset} with exception: {ExceptionMessage}",
+                "Billing Service - Request {Name} failed at {DateTimeOffset} with exception: {ExceptionMessage}",
                 requestName, utcNow, exception.Message);
 
             throw;
