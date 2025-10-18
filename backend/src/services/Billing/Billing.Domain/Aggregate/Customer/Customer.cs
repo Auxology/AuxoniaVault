@@ -188,6 +188,8 @@ public class Customer : Entity, IAggregateRoot
     public Result CompleteSubscriptionCancellation
     (
         string stripeSubscriptionId,
+        string planName,
+        string priceFormatted,
         DateTimeOffset currentPeriodEnd,
         DateTimeOffset currentPeriodStart,
         IDateTimeProvider dateTimeProvider
@@ -210,8 +212,21 @@ public class Customer : Entity, IAggregateRoot
 
         if (cancelResult.IsFailure)
             return cancelResult;
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
 
-        // TODO: Raise Domain Event
+        Raise(new SubscriptionCanceledDomainEvent
+        (
+            UserId.Value,
+            StripeCustomerName,
+            StripeCustomerEmail,
+            stripeSubscriptionId,
+            planName,
+            priceFormatted,
+            currentPeriodStart,
+            currentPeriodEnd,
+            utcNow
+        ));
 
         return Result.Success();
     }

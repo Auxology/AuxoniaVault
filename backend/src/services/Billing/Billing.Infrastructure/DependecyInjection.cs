@@ -2,13 +2,11 @@ using System.Text;
 using Billing.Application.Abstractions.Authentication;
 using Billing.Application.Abstractions.Database;
 using Billing.Application.Abstractions.Messaging;
-using Billing.Application.Abstractions.Services;
 using Billing.Domain.Events;
 using Billing.Infrastructure.Authentication;
 using Billing.Infrastructure.Database;
 using Billing.Infrastructure.DomainEvents;
 using Billing.Infrastructure.IntegrationEvents.SubscriptionActivated;
-using Billing.Infrastructure.Services;
 using Billing.Infrastructure.Settings;
 using Billing.Infrastructure.Time;
 using Billing.SharedKernel;
@@ -20,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Stripe;
+using Stripe.Checkout;
 
 namespace Billing.Infrastructure;
 
@@ -105,11 +104,10 @@ public static class DependencyInjection
 
         services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
         services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
-        services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
-        services.AddTransient<IStripeWebhookService, StripeWebhookService>();
         
-        // Register Stripe services for dependency injection
         services.AddTransient<SubscriptionService>();
+        services.AddTransient<SessionService>();
+        services.AddTransient<CustomerService>();
         services.AddTransient<ProductService>();
         services.AddTransient<PriceService>();
 
