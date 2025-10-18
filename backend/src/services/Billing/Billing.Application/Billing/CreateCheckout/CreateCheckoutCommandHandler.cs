@@ -45,8 +45,6 @@ internal sealed class CreateCheckoutCommandHandler(
         if (checkoutSessionResult.IsFailure)
             return Result.Failure<string>(checkoutSessionResult.Error);
         
-        
-
         return Result.Success(checkoutSessionResult.Value);
     }
 }

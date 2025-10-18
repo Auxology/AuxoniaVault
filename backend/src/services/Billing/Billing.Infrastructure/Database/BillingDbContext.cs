@@ -1,5 +1,6 @@
 using Billing.Application.Abstractions.Database;
 using Billing.Domain.Aggregate.Customer;
+using Billing.Domain.Aggregate.Webhook;
 using Billing.Domain.Entities;
 using Billing.Infrastructure.DomainEvents;
 using Billing.SharedKernel;
@@ -21,6 +22,8 @@ public sealed class BillingDbContext(DbContextOptions<BillingDbContext> options,
     public DbSet<Customer> Customers { get; set; }
 
     public DbSet<Subscription> Subscriptions { get; set; }
+    
+    public DbSet<WebhookEvent> WebhookEvents { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
