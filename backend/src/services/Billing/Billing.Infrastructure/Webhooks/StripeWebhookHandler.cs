@@ -57,11 +57,7 @@ public sealed class StripeWebhookHandler
         }
         
         WebhookEvent webhookEvent = webhookEventResult.Value;
-        
-        await context.WebhookEvents.AddAsync(webhookEvent, cancellationToken);
-        
-        await context.SaveChangesAsync(cancellationToken);
-
+                
         Result processingResult = stripeEvent.Type switch
         {
             EventTypes.CheckoutSessionCompleted => await HandleCheckoutSessionCompletedAsync(stripeEvent,
@@ -76,7 +72,6 @@ public sealed class StripeWebhookHandler
             if (markingResult.IsFailure)
             {
                 logger.LogError("Failed to mark WebhookEvent as processed: {Error}", markingResult.Error.Code);
-                await context.SaveChangesAsync(cancellationToken);
             }
         }
         else
@@ -86,10 +81,13 @@ public sealed class StripeWebhookHandler
             if (markingResult.IsFailure)
             {
                 logger.LogError("Failed to mark WebhookEvent as failed: {Error}", markingResult.Error.Code);
-                await context.SaveChangesAsync(cancellationToken);
             }
         }
+
+        await context.WebhookEvents.AddAsync(webhookEvent, cancellationToken);
         
+        await context.SaveChangesAsync(cancellationToken);
+
         return processingResult;
     }
     
