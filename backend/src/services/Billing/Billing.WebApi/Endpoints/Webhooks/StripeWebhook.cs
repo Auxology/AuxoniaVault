@@ -34,7 +34,7 @@ internal sealed class StripeWebhook : IEndpoint
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
         })
         .AllowAnonymous()
-        .WithName(Names.StripeWebhook)
+        .WithName("StripeWebhook")
         .WithTags(Tags.StripeWebhook)
         .WithOpenApi(operation =>
         {

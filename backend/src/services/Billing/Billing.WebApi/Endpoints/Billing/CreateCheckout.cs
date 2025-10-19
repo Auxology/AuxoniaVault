@@ -25,7 +25,7 @@ internal sealed class CreateCheckout : IEndpoint
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
-        .WithName(Names.Billing)
+        .WithName("CreateCheckout")
         .WithTags(Tags.Billing)
         .WithOpenApi(operation =>
         {
