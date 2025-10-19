@@ -30,7 +30,7 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired();
         
         b.Property(c => c.StripeCustomerName)
-            .HasColumnType("text")
+            .HasColumnType("varchar")
             .IsRequired(); 
         
         b.Property(c => c.StripeCustomerEmail)

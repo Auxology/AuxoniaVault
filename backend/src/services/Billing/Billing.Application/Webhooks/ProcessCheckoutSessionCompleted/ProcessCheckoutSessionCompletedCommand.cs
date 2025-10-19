@@ -9,6 +9,7 @@ public sealed record ProcessCheckoutSessionCompletedCommand
     string StripePriceId,
     string ProductName,
     string PriceFormatted,
+    string EventType,
     DateTimeOffset CurrentPeriodStart,
     DateTimeOffset CurrentPeriodEnd
 ) : ICommand;

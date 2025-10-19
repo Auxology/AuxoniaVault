@@ -23,6 +23,8 @@ public sealed class BillingDbContext(DbContextOptions<BillingDbContext> options,
 
     public DbSet<Subscription> Subscriptions { get; set; }
     
+    public DbSet<SubscriptionHistory> SubscriptionHistories { get; set; }
+    
     public DbSet<WebhookEvent> WebhookEvents { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

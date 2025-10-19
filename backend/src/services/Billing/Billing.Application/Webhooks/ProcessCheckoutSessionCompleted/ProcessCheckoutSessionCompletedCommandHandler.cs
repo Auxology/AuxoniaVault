@@ -14,6 +14,7 @@ internal sealed class ProcessCheckoutSessionCompletedCommandHandler(IBillingDbCo
     {
         Customer? customer = await context.Customers
             .Include(c => c.Subscriptions)
+            .Include(c => c.SubscriptionHistories)
             .FirstOrDefaultAsync(c => c.StripeCustomerId == request.StripeCustomerId, cancellationToken);
         
         if (customer is null)
@@ -36,6 +37,7 @@ internal sealed class ProcessCheckoutSessionCompletedCommandHandler(IBillingDbCo
             request.StripeSubscriptionId,
             request.ProductName,
             request.PriceFormatted,
+            request.EventType,
             request.CurrentPeriodStart,
             request.CurrentPeriodEnd,
             dateTimeProvider

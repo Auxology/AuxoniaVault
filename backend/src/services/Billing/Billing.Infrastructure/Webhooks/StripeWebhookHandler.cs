@@ -125,6 +125,7 @@ public sealed class StripeWebhookHandler
             productInfoViewModel.PriceId,
             productInfoViewModel.ProductName,
             productInfoViewModel.PriceFormatted,
+            stripeEvent.Type,
             productInfoViewModel.CurrentPeriodStart,
             productInfoViewModel.CurrentPeriodEnd
         );

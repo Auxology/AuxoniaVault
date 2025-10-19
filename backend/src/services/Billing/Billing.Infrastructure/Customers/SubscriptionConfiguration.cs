@@ -4,7 +4,7 @@ using Billing.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Billing.Infrastructure.Subscriptions;
+namespace Billing.Infrastructure.Customers;
 
 internal sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
 {

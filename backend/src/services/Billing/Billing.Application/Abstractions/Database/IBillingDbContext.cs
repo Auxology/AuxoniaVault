@@ -11,6 +11,8 @@ public interface IBillingDbContext
     
     DbSet<Subscription> Subscriptions { get; }
     
+    DbSet<SubscriptionHistory> SubscriptionHistories { get; }
+    
     DbSet<WebhookEvent> WebhookEvents { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

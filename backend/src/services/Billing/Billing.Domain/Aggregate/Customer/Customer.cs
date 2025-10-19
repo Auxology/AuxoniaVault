@@ -20,6 +20,8 @@ public class Customer : Entity, IAggregateRoot
     
     public ICollection<Subscription> Subscriptions { get; private set; }
     
+    public ICollection<SubscriptionHistory> SubscriptionHistories { get; private set; }
+    
     private Customer() { } // For EF Core
     
     private Customer(UserId userId, string stripeCustomerId, string stripeCustomerName, string stripeCustomerEmail)
@@ -29,6 +31,7 @@ public class Customer : Entity, IAggregateRoot
         StripeCustomerName = stripeCustomerName;
         StripeCustomerEmail = stripeCustomerEmail;
         Subscriptions = [];
+        SubscriptionHistories = [];
     }
     
     public static Result<Customer> Create(UserId userId, string stripeCustomerId, string stripeCustomerName, string stripeCustomerEmail)
@@ -52,12 +55,6 @@ public class Customer : Entity, IAggregateRoot
     
     public Result<Subscription> StartSubscription(string stripeSubscriptionId, string stripePriceId, DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
-        if  (string.IsNullOrWhiteSpace((stripeSubscriptionId)))
-            return Result.Failure<Subscription>(SubscriptionErrors.StripeSubscriptionIdRequired);
-        
-        if (string.IsNullOrWhiteSpace((stripePriceId)))
-            return Result.Failure<Subscription>(SubscriptionErrors.StripePriceIdRequired);
-        
         if (!Subscriptions.Any())
             Subscriptions = [];
         
@@ -85,7 +82,7 @@ public class Customer : Entity, IAggregateRoot
         return Result.Success(subscriptionResult.Value);
     }
 
-    public Result ActivateSubscription(string stripeSubscriptionId, string productName, string priceFormatted, DateTimeOffset currentPeriodStart,
+    public Result ActivateSubscription(string stripeSubscriptionId, string productName, string priceFormatted, string eventType, DateTimeOffset currentPeriodStart,
         DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
         if (!Subscriptions.Any())
@@ -107,6 +104,21 @@ public class Customer : Entity, IAggregateRoot
         
         if (activationResult.IsFailure)
             return Result.Failure(activationResult.Error);
+
+        Result<SubscriptionHistory> historyResult = SubscriptionHistory.Create
+        (
+            stripeSubscriptionId,
+            productName,
+            priceFormatted,
+            eventType,
+            currentPeriodStart,
+            currentPeriodEnd
+        );
+        
+        if (historyResult.IsFailure)
+            return Result.Failure(historyResult.Error);
+        
+        SubscriptionHistories.Add(historyResult.Value);
         
         Raise(new SubscriptionActivatedDomainEvent
         (
