@@ -19,7 +19,7 @@ internal sealed class SubscriptionActivatedDomainEventHandler(IPublishEndpoint p
             domainEvent.StripeCustomerName,
             domainEvent.StripeCustomerEmail,
             domainEvent.PriceFormatted,
-            domainEvent.PlanName,
+            domainEvent.ProductName,
             domainEvent.CurrentPeriodStart,
             domainEvent.CurrentPeriodEnd
         );

@@ -25,6 +25,13 @@ internal sealed class CreateCheckout : IEndpoint
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
-        .WithTags(Tags.Billing);
+        .WithName(Names.Billing)
+        .WithTags(Tags.Billing)
+        .WithOpenApi(operation =>
+        {
+            operation.Summary = "Create a Stripe checkout session";
+            operation.Description = "Creates a new Stripe checkout session for the specified price ID";
+            return operation;
+        });
     }
 }

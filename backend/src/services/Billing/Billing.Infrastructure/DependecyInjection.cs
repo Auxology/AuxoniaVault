@@ -2,13 +2,17 @@ using System.Text;
 using Billing.Application.Abstractions.Authentication;
 using Billing.Application.Abstractions.Database;
 using Billing.Application.Abstractions.Messaging;
+using Billing.Application.Abstractions.Services;
 using Billing.Domain.Events;
 using Billing.Infrastructure.Authentication;
 using Billing.Infrastructure.Database;
 using Billing.Infrastructure.DomainEvents;
 using Billing.Infrastructure.IntegrationEvents.SubscriptionActivated;
+using Billing.Infrastructure.Services;
 using Billing.Infrastructure.Settings;
 using Billing.Infrastructure.Time;
+using Billing.Infrastructure.Webhooks;
+using Billing.Infrastructure.Webhooks.Services;
 using Billing.SharedKernel;
 using MassTransit;
 using MediatR;
@@ -110,6 +114,11 @@ public static class DependencyInjection
         services.AddTransient<CustomerService>();
         services.AddTransient<ProductService>();
         services.AddTransient<PriceService>();
+        
+        services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
+        services.AddTransient<IStripeSubscriptionFetcher, StripeSubscriptionFetcher>();
+        services.AddTransient<IStripeWebhookMapper, StripeWebhookMapper>();
+        services.AddScoped<StripeWebhookHandler>();
 
         return services;
     }

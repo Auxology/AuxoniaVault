@@ -19,6 +19,8 @@ public class WebhookEvent : Entity, IAggregateRoot
     public string? ErrorMessage { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
+    
+    public DateTimeOffset? FailedAt { get; private set; }
 
     public DateTimeOffset? ProcessedAt { get; private set; }
 
@@ -33,7 +35,7 @@ public class WebhookEvent : Entity, IAggregateRoot
         CreatedAt = utcNow;
     }
 
-    public static Result<WebhookEvent> Creat(string stripeEventId, string stripeEventType,
+    public static Result<WebhookEvent> Create(string stripeEventId, string stripeEventType,
         IDateTimeProvider dateTimeProvider)
     {
         if (string.IsNullOrWhiteSpace(stripeEventId))
@@ -54,14 +56,17 @@ public class WebhookEvent : Entity, IAggregateRoot
         if (Status == WebhookEventStatus.Processed)
             return Result.Failure(WebhookEventErrors.AlreadyProcessed);
         
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
         Status = WebhookEventStatus.Processed;
         ProcessedAt = dateTimeProvider.UtcNow;
         ErrorMessage = null;
+        ProcessedAt = utcNow;
         
         return Result.Success();
     }
     
-    public Result MarkAsFailed(string errorMessage)
+    public Result MarkAsFailed(string errorMessage, IDateTimeProvider dateTimeProvider)
     {
         if (Status == WebhookEventStatus.Processed)
             return Result.Failure(WebhookEventErrors.AlreadyProcessed);
@@ -69,6 +74,7 @@ public class WebhookEvent : Entity, IAggregateRoot
         RetryCount++;
         Status = WebhookEventStatus.Failed;
         ErrorMessage = errorMessage;
+        FailedAt = dateTimeProvider.UtcNow;
         
         return Result.Success();
     }
