@@ -9,4 +9,10 @@ internal static class SubscriptionErrors
         "Subscriptions.ActiveSubscriptionAlreadyExists",
         "Customer already has an active subscription."
     );
+    
+    public static Error SubscriptionNotFound => Error.NotFound
+    (
+        "Subscriptions.SubscriptionNotFound",
+        "Subscription not found."
+    );
 }

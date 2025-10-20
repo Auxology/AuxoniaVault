@@ -30,6 +30,7 @@ internal sealed class GetUsersSubscriptionHistoriesQueryHandler(IBillingDbContex
             .Select(sh => new SubscriptionHistoryReadModel
             (
                 sh.Id,
+                sh.StripeSubscriptionId,
                 sh.ProductName,
                 sh.PriceFormatted,
                 sh.EventType,

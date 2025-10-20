@@ -57,4 +57,10 @@ internal static class SubscriptionErrors
         "Subscriptions.OnlyActiveSubscriptionsCanBeCancelled",
         "Only active subscriptions can be cancelled."
     );
+    
+    public static Error SubscriptionAlreadyPendingCancellation => Error.Conflict
+    (
+        "Subscriptions.SubscriptionAlreadyPendingCancellation",
+        "The subscription is already pending cancellation at the end of the period."
+    );
 }

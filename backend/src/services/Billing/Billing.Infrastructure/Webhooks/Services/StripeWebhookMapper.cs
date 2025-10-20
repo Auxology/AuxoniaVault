@@ -1,3 +1,4 @@
+using Billing.Domain.Aggregate.Customer;
 using Billing.Infrastructure.Webhooks.Constants;
 using Billing.Infrastructure.Webhooks.ViewModels;
 using Billing.SharedKernel;
@@ -38,5 +39,19 @@ internal sealed class StripeWebhookMapper(IDateTimeProvider dateTimeProvider) : 
             currentPeriodStart,
             currentPeriodEnd 
         );
+    }
+
+    public SubscriptionStatus MapStripeSubscriptionStatus(string stripeStatus)
+    {
+        return stripeStatus.ToLower() switch
+        {
+            "active" => SubscriptionStatus.Active,
+            "past_due" => SubscriptionStatus.PastDue,
+            "canceled" => SubscriptionStatus.Cancelled,
+            "unpaid" => SubscriptionStatus.Unpaid,
+            "incomplete" => SubscriptionStatus.Incomplete,
+            "trialing" => SubscriptionStatus.Trialing,
+            _ => SubscriptionStatus.Cancelled
+        };
     }
 }

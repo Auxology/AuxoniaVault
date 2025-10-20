@@ -1,5 +1,8 @@
 using Billing.Application.Abstractions.Database;
 using Billing.Application.Webhooks.ProcessCheckoutSessionCompleted;
+using Billing.Application.Webhooks.ProcessSubscriptionDeleted;
+using Billing.Application.Webhooks.ProcessSubscriptionUpdated;
+using Billing.Domain.Aggregate.Customer;
 using Billing.Domain.Aggregate.Webhook;
 using Billing.Infrastructure.Settings;
 using Billing.Infrastructure.Webhooks.Services;
@@ -60,8 +63,9 @@ public sealed class StripeWebhookHandler
                 
         Result processingResult = stripeEvent.Type switch
         {
-            EventTypes.CheckoutSessionCompleted => await HandleCheckoutSessionCompletedAsync(stripeEvent,
-                cancellationToken),
+            EventTypes.CheckoutSessionCompleted => await HandleCheckoutSessionCompletedAsync(stripeEvent, cancellationToken),
+            EventTypes.CustomerSubscriptionUpdated => await HandleCustomerSubscriptionUpdatedAsync(stripeEvent, cancellationToken),
+            EventTypes.CustomerSubscriptionDeleted => await HandleSubscriptionDeletedAsync(stripeEvent, cancellationToken),
             _ => HandleUnsupportedEventType(stripeEvent.Type)
         };
 
@@ -126,6 +130,62 @@ public sealed class StripeWebhookHandler
             productInfoViewModel.ProductName,
             productInfoViewModel.PriceFormatted,
             stripeEvent.Type,
+            productInfoViewModel.CurrentPeriodStart,
+            productInfoViewModel.CurrentPeriodEnd
+        );
+        
+        return await sender.Send(command, cancellationToken);
+    }
+    
+    private async Task<Result> HandleCustomerSubscriptionUpdatedAsync(Event stripeEvent, CancellationToken cancellationToken)
+    {
+        Subscription? subscription = stripeEvent.Data.Object as Subscription;
+        
+        if (subscription is null || subscription.CustomerId is null || string.IsNullOrWhiteSpace(subscription.CustomerId))
+        {
+            logger.LogWarning("Subscription object is invalid or missing required fields");
+            return Result.Failure(WebhookErrors.InvalidEventData);
+        }
+        
+        logger.LogInformation("Processing Customer Subscription Updated for Subscription ID: {SubscriptionId}", subscription.Id);
+        
+        SubscriptionProductInfoViewModel productInfoViewModel = stripeWebhookMapper.ExtractProductInfo(subscription);
+
+        SubscriptionStatus mappedStatus = stripeWebhookMapper.MapStripeSubscriptionStatus(subscription.Status);
+        
+        var command = new ProcessSubscriptionUpdatedCommand
+        (
+            subscription.CustomerId,
+            subscription.Id,
+            mappedStatus,
+            productInfoViewModel.CurrentPeriodStart,
+            productInfoViewModel.CurrentPeriodEnd,
+            subscription.CancelAtPeriodEnd
+        );
+        
+        return await sender.Send(command, cancellationToken);
+    }
+    
+    private async Task<Result> HandleSubscriptionDeletedAsync(Event stripeEvent, CancellationToken cancellationToken)
+    {
+        Subscription? subscription = stripeEvent.Data.Object as Subscription;
+        
+        if (subscription is null || subscription.CustomerId is null || string.IsNullOrWhiteSpace(subscription.CustomerId))
+        {
+            logger.LogWarning("Subscription object is invalid or missing required fields");
+            return Result.Failure(WebhookErrors.InvalidEventData);
+        }
+        
+        logger.LogInformation("Processing Customer Subscription Deleted for Subscription ID: {SubscriptionId}", subscription.Id);
+        
+        SubscriptionProductInfoViewModel productInfoViewModel = stripeWebhookMapper.ExtractProductInfo(subscription);
+        
+        var command = new ProcessSubscriptionDeletedCommand
+        (
+            subscription.CustomerId,
+            subscription.Id,
+            productInfoViewModel.ProductName,
+            productInfoViewModel.PriceFormatted,
             productInfoViewModel.CurrentPeriodStart,
             productInfoViewModel.CurrentPeriodEnd
         );

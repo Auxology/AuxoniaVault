@@ -181,6 +181,9 @@ public class Customer : Entity, IAggregateRoot
 
         if (subscription.Status != SubscriptionStatus.Active)
             return Result.Failure(SubscriptionErrors.OnlyActiveSubscriptionsCanBeCancelled);
+        
+        if (subscription.CancelAtPeriodEnd)
+            return Result.Failure(SubscriptionErrors.SubscriptionAlreadyPendingCancellation);
 
         Result cancelResult = subscription.Update
         (

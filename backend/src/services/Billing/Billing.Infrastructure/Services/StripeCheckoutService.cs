@@ -7,7 +7,7 @@ using Stripe.Checkout;
 
 namespace Billing.Infrastructure.Services;
 
-internal sealed class StripeCheckoutService(IStripeClient stripeClient, IOptions<StripeSettings> stripeSettings) : IStripeCheckoutService
+internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSettings, SessionService sessionService ,SubscriptionService subscriptionService) : IStripeCheckoutService
 {
     public async Task<Result<string>> CreateCheckoutSessionAsync(string customerId, string priceId,
         CancellationToken cancellationToken)
@@ -41,8 +41,7 @@ internal sealed class StripeCheckoutService(IStripeClient stripeClient, IOptions
                 }
             };
              
-            var service = new SessionService(stripeClient);
-            var session = await service.CreateAsync(options, null, cancellationToken);
+            var session = await sessionService.CreateAsync(options, null, cancellationToken);
             
             return Result.Success(session.Url);
         }
@@ -53,6 +52,29 @@ internal sealed class StripeCheckoutService(IStripeClient stripeClient, IOptions
         catch (Exception ex)
         {
             return Result.Failure<string>(StripeErrors.GeneralError(ex.Message));
+        }
+    }
+
+    public async Task<Result> CancelSubscriptionAtPeriodEndAsync(string stripeSubscriptionId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var options = new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = true
+            };
+            
+            await subscriptionService.UpdateAsync(stripeSubscriptionId, options, null, cancellationToken);
+            
+            return Result.Success();
+        }        
+        catch (StripeException ex)
+        {
+            return Result.Failure(StripeErrors.StripeError(ex.StripeError.Code, ex.StripeError.Message));
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(StripeErrors.GeneralError(ex.Message));
         }
     }
 }

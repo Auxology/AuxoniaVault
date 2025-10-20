@@ -127,6 +127,7 @@ public class Subscription : Entity
         if (Status != SubscriptionStatus.Active)
             return Result.Failure(SubscriptionErrors.CannotCancelInactiveSubscription);
         
+        Status = SubscriptionStatus.Cancelled;
         CancelAtPeriodEnd = true;
         CurrentPeriodStart = currentPeriodStart;
         CurrentPeriodEnd = currentPeriodEnd;

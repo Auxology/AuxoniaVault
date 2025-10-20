@@ -7,6 +7,7 @@ public sealed record GetUsersSubscriptionHistoriesQuery() : IQuery<List<Subscrip
 public sealed record SubscriptionHistoryReadModel
 (
     int Id,
+    string StripeSubscriptionId,
     string ProductName,
     string PriceFormatted,
     string EventType,
