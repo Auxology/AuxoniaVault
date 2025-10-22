@@ -144,6 +144,7 @@ services:
       - Stripe__SuccessUrl=${STRIPE_SUCCESS_URL:-http://localhost:3000/subscription/success}
       - Stripe__CancelUrl=${STRIPE_CANCEL_URL:-http://localhost:3000/subscription/cancel}
       - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET:-whsec_your_webhook_secret}
+      - Stripe__BillingPortalReturnUrl=${STRIPE_BILLING_PORTAL_RETURN_URL:-http://localhost:3000/billing}
     networks:
       - auxonia-network
 

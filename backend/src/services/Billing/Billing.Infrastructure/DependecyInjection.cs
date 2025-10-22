@@ -22,7 +22,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Stripe;
-using Stripe.Checkout;
 
 namespace Billing.Infrastructure;
 
@@ -109,15 +108,17 @@ public static class DependencyInjection
         services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
         services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
         
-        services.AddTransient<SubscriptionService>();
-        services.AddTransient<SessionService>();
-        services.AddTransient<CustomerService>();
-        services.AddTransient<ProductService>();
-        services.AddTransient<PriceService>();
+        services.AddSingleton<SubscriptionService>();
+        services.AddSingleton<Stripe.Checkout.SessionService>();
+        services.AddSingleton<Stripe.BillingPortal.SessionService>();
+        services.AddSingleton<CustomerService>();
+        services.AddSingleton<ProductService>();
+        services.AddSingleton<PriceService>();
         
         services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
         services.AddTransient<IStripeSubscriptionFetcher, StripeSubscriptionFetcher>();
         services.AddTransient<IStripeWebhookMapper, StripeWebhookMapper>();
+        services.AddTransient<IStripeBillingPortalService, StripeBillingPortalService>();
         services.AddScoped<StripeWebhookHandler>();
 
         return services;
