@@ -24,7 +24,7 @@ internal sealed class VerifyLogin : IEndpoint
             var result = await sender.Send(command);
 
             if (result.IsFailure)
-                CustomResults.Problem(result, httpContext);
+                return CustomResults.Problem(result, httpContext);
 
             httpContext.SetAuthenticationCookie(result.Value.RefreshToken);
 
