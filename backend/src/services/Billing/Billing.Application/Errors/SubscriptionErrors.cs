@@ -21,4 +21,16 @@ internal static class SubscriptionErrors
         "Subscriptions.NoActiveSubscription",
         "Customer does not have an active subscription."
     );
+    
+    public static Error SubscriptionNotActive => Error.Validation
+    (
+        "Subscriptions.SubscriptionNotActive",
+        "Subscription is not active."
+    );
+    
+    public static Error SubscriptionNotScheduledForCancellation => Error.Validation
+    (
+        "Subscriptions.SubscriptionNotScheduledForCancellation",
+        "This subscription is not scheduled for cancellation."
+    );
 }

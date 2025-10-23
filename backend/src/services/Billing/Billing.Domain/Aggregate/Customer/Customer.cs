@@ -245,4 +245,39 @@ public class Customer : Entity, IAggregateRoot
 
         return Result.Success();
     }
+    
+    public Result ResumeSubscription
+    (
+        string stripeSubscriptionId,
+        DateTimeOffset currentPeriodStart,
+        DateTimeOffset currentPeriodEnd,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        if (!Subscriptions.Any())
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+
+        Subscription? subscription = Subscriptions
+            .FirstOrDefault(s => s.StripeSubscriptionId == stripeSubscriptionId);
+
+        if (subscription is null)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotFound);
+
+        if (subscription.Status != SubscriptionStatus.Active)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotActive);
+
+        if (!subscription.CancelAtPeriodEnd)
+            return Result.Failure(SubscriptionErrors.SubscriptionNotScheduledForCancellation);
+
+        Result resumeResult = subscription.Update
+        (
+            SubscriptionStatus.Active,
+            currentPeriodStart,
+            currentPeriodEnd,
+            cancelAtPeriodEnd: false,
+            dateTimeProvider
+        );
+
+        return Result.Success();
+    }
 }

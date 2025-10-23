@@ -63,4 +63,16 @@ internal static class SubscriptionErrors
         "Subscriptions.SubscriptionAlreadyPendingCancellation",
         "The subscription is already pending cancellation at the end of the period."
     );
+    
+    public static Error SubscriptionNotActive => Error.Validation
+    (
+        "Subscriptions.SubscriptionNotActive",
+        "Subscription is not active."
+    );
+    
+    public static Error SubscriptionNotScheduledForCancellation => Error.Validation
+    (
+        "Subscriptions.SubscriptionNotScheduledForCancellation",
+        "This subscription is not scheduled for cancellation."
+    );
 }

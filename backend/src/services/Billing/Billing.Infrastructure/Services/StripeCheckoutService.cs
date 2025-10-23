@@ -77,4 +77,27 @@ internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSetti
             return Result.Failure(StripeErrors.GeneralError(ex.Message));
         }
     }
+
+    public async Task<Result> ResumeSubscriptionAsync(string stripeSubscriptionId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var options = new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = false
+            };
+            
+            await subscriptionService.UpdateAsync(stripeSubscriptionId, options, null, cancellationToken);
+            
+            return Result.Success();
+        }        
+        catch (StripeException ex)
+        {
+            return Result.Failure(StripeErrors.StripeError(ex.StripeError.Code, ex.StripeError.Message));
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(StripeErrors.GeneralError(ex.Message));
+        }
+    }
 }
