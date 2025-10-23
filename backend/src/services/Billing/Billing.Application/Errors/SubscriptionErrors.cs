@@ -15,4 +15,10 @@ internal static class SubscriptionErrors
         "Subscriptions.SubscriptionNotFound",
         "Subscription not found."
     );
+    
+    public static Error NoActiveSubscription => Error.NotFound
+    (
+        "Subscriptions.NoActiveSubscription",
+        "Customer does not have an active subscription."
+    );
 }
