@@ -1,4 +1,5 @@
 using Auth.Application.Abstractions.Database;
+using Auth.Domain.Aggregates.AuditLog;
 using Auth.Domain.Aggregates.LoginVerification;
 using Auth.Domain.Aggregates.Session;
 using Auth.Domain.Aggregates.User;
@@ -21,6 +22,8 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
     public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
     
     public DbSet<UserRecoveryRequest> UserRecoveryRequests { get; set; }
+    
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
