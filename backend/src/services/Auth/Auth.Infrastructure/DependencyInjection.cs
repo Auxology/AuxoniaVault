@@ -24,8 +24,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Quartz;
 
 namespace Auth.Infrastructure;
@@ -35,6 +41,7 @@ public static class DependencyInjection
     public static IServiceCollection
         AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
         services
+            .AddOtel()
             .AddServices()
             .AddDatabase(configuration)
             .AddStorage(configuration)
@@ -42,7 +49,35 @@ public static class DependencyInjection
             .AddConsumers()
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal();
-
+    
+    private static IServiceCollection AddOtel(this IServiceCollection services)
+    {
+        services.AddOpenTelemetry()
+            .ConfigureResource(r => r.AddService("AuthService"))
+            .WithMetrics(metrics => 
+                metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddNpgsqlInstrumentation())
+            .WithTracing(tracing =>
+                tracing
+                    .AddHttpClientInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddEntityFrameworkCoreInstrumentation()
+                    .AddNpgsql()
+                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName)
+            )
+            .UseOtlpExporter();
+        
+        services.AddLogging(builder => builder.AddOpenTelemetry(options =>
+        {
+            options.IncludeScopes = true;
+            options.ParseStateValues = true;
+        }));
+        
+        return services;
+    }
+    
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
