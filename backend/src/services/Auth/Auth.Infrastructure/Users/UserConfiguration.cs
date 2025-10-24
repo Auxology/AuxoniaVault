@@ -63,5 +63,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         });
 
         b.Navigation(u => u.EmailChangeRequests).AutoInclude(false);
+        b.Navigation(u => u.RecoveryCodes).AutoInclude(false);
+        b.Navigation(u => u.RecoveryRequests).AutoInclude(false);
     }
 }

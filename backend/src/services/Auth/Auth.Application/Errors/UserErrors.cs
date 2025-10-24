@@ -21,4 +21,16 @@ internal static class UserErrors
         "Users.Unauthorized",
         "You are not authorized to perform this action."
     );
+    
+    public static Error InvalidRecoveryCode => Error.Validation
+    (
+        "Users.RecoveryCodeInvalid",
+        "The provided recovery code is invalid."
+    );
+    
+    public static Error NoRecoveryCodesAvailable => Error.Validation
+    (
+        "Users.NoRecoveryCodesAvailable",
+        "No recovery codes are available for this user."
+    );
 }

@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.SharedKernel;
 
 namespace Auth.Domain.Errors;
@@ -26,5 +27,29 @@ internal static class UserErrors
     (
         "Users.AvatarKeyRequired",
         "The avatar key is required."
+    );
+
+    public static Error RecoveryCodesExceedLimit => Error.Validation
+    (
+        "Users.RecoveryCodesExceedLimit",
+        $"The number of recovery codes exceeds the limit of {UserConstants.MaxRecoveryCodes}"
+    );
+    
+    public static Error RecoveryCodesAlreadyExist => Error.Conflict
+    (
+        "Users.RecoveryCodesAlreadyExist",
+        "The user already has recovery codes."
+    );
+    
+    public static Error RecoveryRequestUserMismatch => Error.Unauthorized
+    (
+        "Users.RecoveryRequestUserMismatch",
+        "The recovery request does not belong to the specified user."
+    );
+    
+    public static Error TooManyActiveRecoveryRequests => Error.Validation
+    (
+        "Users.TooManyActiveRecoveryRequests",
+        $"The user has too many active recovery requests. The limit is {UserConstants.MaxActiveRecoveryRequests}."
     );
 }
