@@ -19,6 +19,8 @@ public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, IDoma
     public DbSet<Session> Sessions { get; set; }
 
     public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
+    
+    public DbSet<UserRecoveryRequest> UserRecoveryRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

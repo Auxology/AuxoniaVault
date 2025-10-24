@@ -3,6 +3,7 @@ using Amazon.S3;
 using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
+using Auth.Application.Abstractions.Services;
 using Auth.Application.Abstractions.Storage;
 using Auth.Domain.Events;
 using Auth.Infrastructure.Authentication;
@@ -13,6 +14,7 @@ using Auth.Infrastructure.IntegrationEvents.EmailChangeRequested;
 using Auth.Infrastructure.IntegrationEvents.LoginRequested;
 using Auth.Infrastructure.IntegrationEvents.SignUp;
 using Auth.Infrastructure.Jobs;
+using Auth.Infrastructure.Services;
 using Auth.Infrastructure.Storage;
 using Auth.Infrastructure.Time;
 using Auth.SharedKernel;
@@ -46,6 +48,8 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddTransient<IDomainEventDispatcher, DomainEventDispatcher>();
+
+        services.AddSingleton<IGenerator, Generator>();
         
         services.AddQuartz(configure =>
         {

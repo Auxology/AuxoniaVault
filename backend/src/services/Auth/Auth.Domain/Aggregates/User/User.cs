@@ -22,6 +22,10 @@ public class User : Entity, IAggregateRoot
     public DateTimeOffset? UpdatedAt { get; private set; }
 
     public virtual ICollection<EmailChangeRequest> EmailChangeRequests { get; private set; }
+    
+    public virtual ICollection<UserRecoveryCode> RecoveryCodes { get; private set; }
+    
+    public virtual ICollection<UserRecoveryRequest> RecoveryRequests { get; private set; }
 
     private User() { } // For EF Core
 
@@ -34,6 +38,8 @@ public class User : Entity, IAggregateRoot
         Avatar = null;
         UpdatedAt = null;
         EmailChangeRequests = [];
+        RecoveryCodes = [];
+        RecoveryRequests = [];
     }
 
     public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
@@ -49,7 +55,7 @@ public class User : Entity, IAggregateRoot
         var user = new User(name, email, utcNow);
 
         user.Raise(new UserCreatedDomainEvent(user.Id.Value, user.Email.Value, user.Name, user.CreatedAt));
-
+        
         return Result.Success(user);
     }
 
@@ -142,6 +148,72 @@ public class User : Entity, IAggregateRoot
             return Result.Failure(UserErrors.EmailCannotBeSame);
 
         Email = newEmail;
+        UpdatedAt = dateTimeProvider.UtcNow;
+
+        return Result.Success();
+    }
+
+    public Result CreateRecoveryCodes(string[] hashedRecoveryCodes, IDateTimeProvider dateTimeProvider)
+    {
+        if (hashedRecoveryCodes.Length == 0)
+            return Result.Failure(UserRecoveryCodeErrors.HashedCodesRequired);
+        
+        if (hashedRecoveryCodes.Length > UserConstants.MaxRecoveryCodes)
+            return Result.Failure(UserErrors.RecoveryCodesExceedLimit);
+        
+        if (RecoveryCodes.Count > 0)
+            return Result.Failure(UserErrors.RecoveryCodesAlreadyExist);
+
+        foreach (var hashedCode in hashedRecoveryCodes)
+        {
+            var recoveryCodeResult = UserRecoveryCode.Create(Id, hashedCode, dateTimeProvider);
+            
+            if (recoveryCodeResult.IsFailure)
+                return Result.Failure(recoveryCodeResult.Error);
+            
+            RecoveryCodes.Add(recoveryCodeResult.Value);
+        }
+        
+        return Result.Success();
+    }
+
+    public Result<UserRecoveryRequest> ApproveRecoveryRequest(string uniqueIdentifier, IDateTimeProvider dateTimeProvider)
+    {
+        IEnumerable<UserRecoveryRequest> recoveryRequests = RecoveryRequests.ToList();
+
+        var now = dateTimeProvider.UtcNow;
+        
+        if (recoveryRequests.Count(r => r.ExpiresAt > now && !r.IsCompleted) >= UserConstants.MaxActiveRecoveryRequests)
+            return Result.Failure<UserRecoveryRequest>(UserErrors.TooManyActiveRecoveryRequests);
+        
+        var requestResult = UserRecoveryRequest.Create
+        (
+            uniqueIdentifier,
+            Id,
+            dateTimeProvider
+        );
+
+        if (requestResult.IsFailure)
+            return Result.Failure<UserRecoveryRequest>(requestResult.Error);
+        
+        RecoveryRequests.Add(requestResult.Value);
+        
+        return requestResult;
+    }
+    
+    public Result CompleteRecovery(UserRecoveryRequest recoveryRequest, EmailAddress newEmail, IDateTimeProvider dateTimeProvider)
+    {
+        if (recoveryRequest.UserId != Id)
+            return Result.Failure(UserErrors.RecoveryRequestUserMismatch);
+        
+        if (newEmail == Email)
+            return Result.Failure(UserErrors.EmailCannotBeSame);
+        
+        var completeResult = recoveryRequest.Complete(newEmail.Value, dateTimeProvider);
+        
+        if (completeResult.IsFailure)
+            return Result.Failure(completeResult.Error);
+        
         UpdatedAt = dateTimeProvider.UtcNow;
 
         return Result.Success();
