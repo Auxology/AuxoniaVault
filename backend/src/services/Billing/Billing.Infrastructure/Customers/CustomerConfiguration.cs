@@ -30,11 +30,11 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired();
         
         b.Property(c => c.StripeCustomerName)
-            .HasColumnType("text")
+            .HasColumnType("varchar")
             .IsRequired(); 
         
         b.Property(c => c.StripeCustomerEmail)
-            .HasColumnType("citext")
+            .HasColumnType("text")
             .IsRequired();
 
         b.HasIndex(c => c.UserId)
@@ -43,5 +43,7 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsUnique();
 
         b.HasIndex(c => c.StripeCustomerEmail);
+
+        b.Navigation(c => c.Subscriptions).AutoInclude(false);
     }
 }

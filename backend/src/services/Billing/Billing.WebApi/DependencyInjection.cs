@@ -11,6 +11,8 @@ public static class DependencyInjection
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
 
+        services.AddControllers();
+
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
