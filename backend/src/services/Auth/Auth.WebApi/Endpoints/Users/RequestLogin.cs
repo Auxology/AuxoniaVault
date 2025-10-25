@@ -1,4 +1,5 @@
 using Auth.Application.Users.RequestLogin;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -16,7 +17,9 @@ internal sealed class RequestLogin() : IEndpoint
             ISender sender
         ) =>
         {
-            var command = new RequestLoginCommand(request.Email);
+            var requestMetadata = httpContext.GetRequestMetadata();
+            
+            var command = new RequestLoginCommand(request.Email, requestMetadata);
 
             var result = await sender.Send(command);
 

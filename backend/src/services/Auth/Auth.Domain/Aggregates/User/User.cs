@@ -42,7 +42,7 @@ public class User : Entity, IAggregateRoot
         RecoveryRequests = [];
     }
 
-    public static Result<User> Create(string name, EmailAddress email, IDateTimeProvider dateTimeProvider)
+    public static Result<User> Create(string name, EmailAddress email, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
         if (string.IsNullOrWhiteSpace(name))
             return Result.Failure<User>(UserErrors.NameRequired);
@@ -54,7 +54,8 @@ public class User : Entity, IAggregateRoot
 
         var user = new User(name, email, utcNow);
 
-        user.Raise(new UserCreatedDomainEvent(user.Id.Value, user.Email.Value, user.Name, user.CreatedAt));
+        user.Raise(new UserCreatedDomainEvent(user.Id.Value, user.Email.Value, user.Name, ipAddress, userAgent,
+            utcNow));
         
         return Result.Success(user);
     }
@@ -111,7 +112,7 @@ public class User : Entity, IAggregateRoot
         return emailChangeRequestResult;
     }
 
-    public Result VerifyCurrentEmail(int currentOtp, int newEmailOtp, IDateTimeProvider dateTimeProvider)
+    public Result VerifyCurrentEmail(int currentOtp, int newEmailOtp, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
         var activeRequest = EmailChangeRequests
             .FirstOrDefault(r =>
@@ -121,10 +122,10 @@ public class User : Entity, IAggregateRoot
         if (activeRequest is null)
             return Result.Failure(EmailChangeRequestErrors.NotFound);
 
-        return activeRequest.VerifyCurrentAndTransitionToVerifyNew(currentOtp, newEmailOtp, dateTimeProvider);
+        return activeRequest.VerifyCurrentAndTransitionToVerifyNew(currentOtp, newEmailOtp, ipAddress, userAgent, dateTimeProvider);
     }
 
-    public Result VerifyNewEmail(int newOtp, IDateTimeProvider dateTimeProvider)
+    public Result VerifyNewEmail(int newOtp, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
         var activeRequest = EmailChangeRequests
             .FirstOrDefault(r =>
@@ -134,10 +135,11 @@ public class User : Entity, IAggregateRoot
         if (activeRequest is null)
             return Result.Failure(EmailChangeRequestErrors.NotFound);
 
-        var verifyResult = activeRequest.VerifyNewAndComplete(newOtp, dateTimeProvider);
+        var verifyResult = activeRequest.VerifyNewAndComplete(newOtp, ipAddress, userAgent, dateTimeProvider);
 
         if (verifyResult.IsFailure)
             return verifyResult;
+        
 
         return CompleteEmailChange(activeRequest.NewEmail, dateTimeProvider);
     }

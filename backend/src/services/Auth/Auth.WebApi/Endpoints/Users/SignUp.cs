@@ -1,5 +1,6 @@
 using Auth.Application.Users.SignUp;
 using Auth.SharedKernel;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -18,7 +19,9 @@ internal sealed class SignUp : IEndpoint
             ISender sender
         ) =>
         {
-            var command = new SignUpCommand(request.Name, request.Email);
+            var requestMetadata = httpContext.GetRequestMetadata();
+            
+            var command = new SignUpCommand(request.Name, request.Email, requestMetadata);
 
             Result<string[]> result = await sender.Send(command);
 

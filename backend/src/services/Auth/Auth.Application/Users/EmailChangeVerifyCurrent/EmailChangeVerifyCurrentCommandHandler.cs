@@ -27,7 +27,9 @@ internal sealed class EmailChangeVerifyCurrentCommandHandler(IAuthDbContext cont
 
         int newEmailOtp = RandomNumberGenerator.GetInt32(100000, 999999);
 
-        Result verifyResult = user.VerifyCurrentEmail(request.CurrentOtp, newEmailOtp, dateTimeProvider);
+        var metadata = request.RequestMetadata;
+        
+        Result verifyResult = user.VerifyCurrentEmail(request.CurrentOtp, newEmailOtp, metadata.IpAddress, metadata.UserAgent, dateTimeProvider);
 
         if (verifyResult.IsFailure)
             return Result.Failure(verifyResult.Error);

@@ -10,9 +10,8 @@ public enum AuditAction
     EmailChanged,
     NameChanged,
     ProfilePictureSet,
-    RecoveryCodesGenerated,
     RecoveryRequested,
     RecoveryCompleted,
     SessionCreated,
-    SessionRevoked
+    SessionsRevoked
 }

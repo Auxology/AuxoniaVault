@@ -29,7 +29,10 @@ internal sealed class RequestLoginCommandHandler(IAuthDbContext context, IDateTi
 
         int loginCode = RandomNumberGenerator.GetInt32(100000, 999999);
 
-        Result<LoginVerification> loginResult = LoginVerification.Create(emailResult.Value, loginCode, dateTimeProvider.UtcNow);
+        var metadata = request.requestMetadata;
+
+        Result<LoginVerification> loginResult = LoginVerification.Create(emailResult.Value, loginCode,
+            metadata.IpAddress, metadata.UserAgent, dateTimeProvider);
 
         if (loginResult.IsFailure)
             return Result.Failure(loginResult.Error);
