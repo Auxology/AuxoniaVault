@@ -73,6 +73,13 @@ public class User : Entity, IAggregateRoot
         Name = newName;
         UpdatedAt = utcNow;
 
+        Raise(new UserNameChangeDomainEvent
+        (
+            Id.Value,
+            newName,
+            utcNow
+        ));
+
         return Result.Success();
     }
 
