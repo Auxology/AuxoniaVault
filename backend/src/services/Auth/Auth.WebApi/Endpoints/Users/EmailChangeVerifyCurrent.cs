@@ -18,7 +18,9 @@ internal sealed class EmailChangeVerifyCurrent : IEndpoint
         )
         =>
         {
-            var command = new EmailChangeVerifyCurrentCommand(request.CurrentOtp);
+            var requestMetadata = httpContext.GetRequestMetadata();
+            
+            var command = new EmailChangeVerifyCurrentCommand(request.CurrentOtp, requestMetadata);
 
             var result = await sender.Send(command, cancellationToken);
 

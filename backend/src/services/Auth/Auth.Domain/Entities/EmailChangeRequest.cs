@@ -80,6 +80,12 @@ public class EmailChangeRequest : Entity
 
     public Result SetCurrentEmailOtp(int otp, string ipAddress, string userAgent)
     {
+        if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidIpAddress);
+        
+        if (string.IsNullOrWhiteSpace(userAgent) || userAgent.Length > RequestMetadataConstants.MaxUserAgentLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidUserAgent);
+        
         if (otp < 100000 || otp > 999999)
             return Result.Failure(EmailChangeRequestErrors.InvalidOtp);
 
@@ -90,6 +96,7 @@ public class EmailChangeRequest : Entity
 
         Raise(new EmailChangeRequestedDomainEvent
         (
+            UserId: UserId.Value,
             CurrentEmail: CurrentEmail.Value,
             CurrentOtp: otp,
             IpAddress: ipAddress,
@@ -100,9 +107,15 @@ public class EmailChangeRequest : Entity
         return Result.Success();
     }
 
-    public Result VerifyCurrentAndTransitionToVerifyNew(int currentOtp, int newOtp,
+    public Result VerifyCurrentAndTransitionToVerifyNew(int currentOtp, int newOtp, string ipAddress, string userAgent,
         IDateTimeProvider dateTimeProvider)
     {
+        if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidIpAddress);
+        
+        if (string.IsNullOrWhiteSpace(userAgent) || userAgent.Length > RequestMetadataConstants.MaxUserAgentLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidUserAgent);
+        
         if (CurrentStep is not EmailChangeStep.VerifyCurrent)
             return Result.Failure<int>(EmailChangeRequestErrors.InvalidStep);
 
@@ -115,16 +128,25 @@ public class EmailChangeRequest : Entity
 
         Raise(new EmailChangeCurrentEmailVerifiedDomainEvent
         (
+            UserId: UserId.Value,
             NewEmail: NewEmail.Value,
             NewOtp: newOtp,
+            IpAddress: ipAddress,
+            UserAgent: userAgent,
             RequestedAt: RequestedAt
         ));
 
         return Result.Success();
     }
 
-    public Result VerifyNewAndComplete(int newOtp, IDateTimeProvider dateTimeProvider)
+    public Result VerifyNewAndComplete(int newOtp, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
+        if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidIpAddress);
+        
+        if (string.IsNullOrWhiteSpace(userAgent) || userAgent.Length > RequestMetadataConstants.MaxUserAgentLength)
+            return Result.Failure(EmailChangeRequestErrors.InvalidUserAgent);
+        
         if (CurrentStep is not EmailChangeStep.VerifyNew)
             return Result.Failure(EmailChangeRequestErrors.InvalidStep);
 
@@ -137,6 +159,8 @@ public class EmailChangeRequest : Entity
         (
             UserId: UserId.Value,
             NewEmail: NewEmail.Value,
+            IpAddress: ipAddress,
+            UserAgent: userAgent,
             ChangedAt: dateTimeProvider.UtcNow
         ));
 

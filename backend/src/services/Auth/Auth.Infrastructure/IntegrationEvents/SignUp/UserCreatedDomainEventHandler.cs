@@ -1,6 +1,5 @@
 using Auth.Application.Abstractions.Messaging;
 using Auth.Domain.Events;
-using Auth.SharedKernel;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;

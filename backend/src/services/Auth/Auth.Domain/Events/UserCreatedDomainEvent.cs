@@ -7,5 +7,7 @@ public sealed record UserCreatedDomainEvent
     Guid UserId,
     string Email,
     string Name,
+    string IpAddress,
+    string UserAgent,
     DateTimeOffset CreatedAt
-) : IDomainEvent;
+) : IDomainEvent, IAuditLoggedDomainEvent;

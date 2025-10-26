@@ -10,8 +10,8 @@ using Customer = Billing.Domain.Aggregate.Customer.Customer;
 namespace Billing.Infrastructure.Consumer;
 
 public sealed class UserCreatedBillingConsumer(
-    IStripeClient stripeClient,
     IBillingDbContext dbContext,
+    CustomerService customerService,
     ILogger<UserCreatedBillingConsumer> logger) : IConsumer<UserCreatedContract>
 {
     public async Task Consume(ConsumeContext<UserCreatedContract> context)
@@ -31,10 +31,7 @@ public sealed class UserCreatedBillingConsumer(
         {
             Email = message.Email,
             Name = message.Name,
-            Metadata = new Dictionary<string, string>
-            {
-                { "UserId", message.UserId.ToString() }
-            }
+                   
         };
 
         var requestOptions = new RequestOptions
@@ -42,7 +39,7 @@ public sealed class UserCreatedBillingConsumer(
             IdempotencyKey = message.UserId.ToString()
         };
 
-        var customer = await new CustomerService(stripeClient).CreateAsync(createOptions, requestOptions);
+        var customer = await customerService.CreateAsync(createOptions, requestOptions);
 
         var customerResult = Customer.Create
         (

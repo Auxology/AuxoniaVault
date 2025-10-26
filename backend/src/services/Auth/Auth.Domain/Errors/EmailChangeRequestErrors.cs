@@ -38,4 +38,16 @@ internal static class EmailChangeRequestErrors
         code: "EmailChangeRequests.NotFound",
         description: "No active email change request found."
     );
+    
+    public static Error InvalidIpAddress => Error.Validation
+    (
+        "EmailChangeRequests.InvalidIpAddress",
+        "The IP address is invalid."
+    );
+    
+    public static Error InvalidUserAgent => Error.Validation
+    (
+        "EmailChangeRequests.InvalidUserAgent",
+        "The user agent is invalid."
+    );
 }

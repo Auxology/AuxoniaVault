@@ -1,3 +1,4 @@
+using Auth.Domain.Aggregates.AuditLog;
 using Auth.Domain.Aggregates.LoginVerification;
 using Auth.Domain.Aggregates.Session;
 using Auth.Domain.Aggregates.User;
@@ -17,6 +18,8 @@ public interface IAuthDbContext
     DbSet<EmailChangeRequest> EmailChangeRequests { get; }
     
     DbSet<UserRecoveryRequest> UserRecoveryRequests { get; }
+    
+    DbSet<AuditLog> AuditLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

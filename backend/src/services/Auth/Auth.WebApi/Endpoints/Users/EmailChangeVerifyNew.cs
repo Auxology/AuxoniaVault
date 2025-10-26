@@ -19,7 +19,9 @@ internal sealed class EmailChangeVerifyNew : IEndpoint
                 HttpContext httpContext
             ) =>
             {
-                var command = new EmailChangeVerifyNewCommand(request.NewOtp);
+                var requestMetadata = httpContext.GetRequestMetadata();
+                
+                var command = new EmailChangeVerifyNewCommand(request.NewOtp, requestMetadata);
 
                 var result = await sender.Send(command, httpContext.RequestAborted);
 

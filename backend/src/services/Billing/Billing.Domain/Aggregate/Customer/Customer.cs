@@ -53,6 +53,26 @@ public class Customer : Entity, IAggregateRoot
         return Result.Success(customer);
     }
     
+    public Result UpdateEmail(string newEmail)
+    {
+        if (string.IsNullOrWhiteSpace(newEmail))
+            return Result.Failure(CustomerErrors.StripeCustomerEmailRequired);
+        
+        StripeCustomerEmail = newEmail;
+        
+        return Result.Success();
+    }
+
+    public Result UpdateName(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            return Result.Failure(CustomerErrors.StripeCustomerNameRequired);
+        
+        StripeCustomerName = newName;
+        
+        return Result.Success();
+    }
+    
     public Result<Subscription> StartSubscription(string stripeSubscriptionId, string stripePriceId, DateTimeOffset currentPeriodStart, DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
         if (!Subscriptions.Any())

@@ -6,5 +6,7 @@ public sealed record EmailChangedDomainEvent
 (
     Guid UserId,
     string NewEmail,
+    string IpAddress,
+    string UserAgent,
     DateTimeOffset ChangedAt
-) : IDomainEvent;
+) : IDomainEvent, IAuditLoggedDomainEvent;

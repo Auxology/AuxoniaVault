@@ -22,7 +22,10 @@ internal sealed class SignUpCommandHandler(IAuthDbContext context, IDateTimeProv
         if (await context.Users.AnyAsync(u => u.Email == emailResult.Value, cancellationToken))
             return Result.Failure<string[]>(UserErrors.EmailNotUnique);
 
-        Result<User> userResult = User.Create(request.Name, emailResult.Value, dateTimeProvider);
+        var metadata = request.RequestMetadata;
+
+        Result<User> userResult = User.Create(request.Name, emailResult.Value, metadata.IpAddress, metadata.UserAgent,
+            dateTimeProvider);
 
         if (userResult.IsFailure)
             return Result.Failure<string[]>(userResult.Error);

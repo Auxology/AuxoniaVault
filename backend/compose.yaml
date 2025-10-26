@@ -1,4 +1,12 @@
 services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    container_name: AuxoniaVault.AspireDashboard
+    ports:
+      - "18888:18888"
+    networks:
+      - auxonia-network
+
   rabbitmq:
     image: rabbitmq:4-management
     container_name: AuxoniaVault.RabbitMQ
@@ -29,7 +37,7 @@ services:
       - auxonia-network
 
   auth.database:
-    image: postgres:latest
+    image: postgres:18.0
     container_name: AuxoniaVault.AuthDb
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-auxonia}
@@ -38,7 +46,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - authdb-data:/var/lib/postgresql/data
+      - authdb-data:/var/lib/postgresql
     networks:
       - auxonia-network
 
@@ -68,6 +76,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3Settings__BucketName=${S3_BUCKET_NAME:-auxoniabucket}
       - S3Settings__RegionName=${S3_REGION_NAME:-eu-central-1}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     networks:
       - auxonia-network
 
@@ -75,6 +84,7 @@ services:
     image: notifications.webapi
     container_name: AuxoniaVault.NotificationsApi
     depends_on:
+      - aspire-dashboard
       - rabbitmq
     build:
       context: .
@@ -97,11 +107,12 @@ services:
       - EmailSettings__SupportEmail=${EMAIL_SUPPORT_EMAIL:-support@auxoniavault.com}
       - EmailSettings__WebsiteUrl=${EMAIL_WEBSITE_URL:-https://auxoniavault.com}
       - EmailSettings__TokenExpirationMinutes=${EMAIL_TOKEN_EXPIRATION_MINUTES:-10}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     networks:
       - auxonia-network
 
   billing.database:
-    image: postgres:latest
+    image: postgres:18.0
     container_name: AuxoniaVault.BillingDb
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-auxonia}
@@ -110,7 +121,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - billingdb-data:/var/lib/postgresql/data
+      - billingdb-data:/var/lib/postgresql
     networks:
       - auxonia-network
 
@@ -119,6 +130,7 @@ services:
     container_name: AuxoniaVault.BillingApi
     depends_on:
       - billing.database
+      - aspire-dashboard
       - rabbitmq
     build:
       context: .
@@ -145,6 +157,7 @@ services:
       - Stripe__CancelUrl=${STRIPE_CANCEL_URL:-http://localhost:3000/subscription/cancel}
       - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET:-whsec_your_webhook_secret}
       - Stripe__BillingPortalReturnUrl=${STRIPE_BILLING_PORTAL_RETURN_URL:-http://localhost:3000/billing}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     networks:
       - auxonia-network
 

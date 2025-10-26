@@ -24,7 +24,9 @@ internal sealed class EmailChangeVerifyNewCommandHandler(IAuthDbContext context,
         if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
 
-        Result verifyResult = user.VerifyNewEmail(request.NewOtp, dateTimeProvider);
+        var metadata = request.RequestMetadata;
+
+        Result verifyResult = user.VerifyNewEmail(request.NewOtp, metadata.IpAddress, metadata.UserAgent, dateTimeProvider);
 
         if (verifyResult.IsFailure)
             return Result.Failure(verifyResult.Error);

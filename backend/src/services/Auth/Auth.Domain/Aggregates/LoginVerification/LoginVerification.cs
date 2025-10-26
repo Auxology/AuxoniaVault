@@ -32,11 +32,19 @@ public class LoginVerification : Entity, IAggregateRoot
         ExpiresAt = CreatedAt.AddMinutes(LoginVerificationConstants.ExpiresInMinutes);
     }
 
-    public static Result<LoginVerification> Create(EmailAddress identifier, int value, DateTimeOffset utcNow)
+    public static Result<LoginVerification> Create(EmailAddress identifier, int value, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
         if (value < 100000 || value > 999999)
             return Result.Failure<LoginVerification>(LoginVerificationErrors.InvalidValue);
 
+        if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
+            return Result.Failure<LoginVerification>(LoginVerificationErrors.InvalidIpAddress);
+        
+        if (string.IsNullOrWhiteSpace(userAgent) || userAgent.Length > RequestMetadataConstants.MaxUserAgentLength)
+            return Result.Failure<LoginVerification>(LoginVerificationErrors.InvalidUserAgent);
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
         var loginVerification = new LoginVerification(identifier, value, utcNow);
 
         loginVerification.Raise(new LoginRequestedDomainEvent
