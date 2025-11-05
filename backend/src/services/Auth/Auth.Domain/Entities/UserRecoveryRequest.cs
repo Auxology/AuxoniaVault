@@ -63,7 +63,7 @@ public class UserRecoveryRequest : Entity
         return Result.Success(request);
     }
     
-    public Result Complete(string newEmail, IDateTimeProvider dateTimeProvider)
+    internal Result Complete(string newEmail, IDateTimeProvider dateTimeProvider)
     {
         if (IsCompleted)
             return Result.Failure(UserRecoveryRequestErrors.AlreadyCompleted);

@@ -53,7 +53,7 @@ public class EmailChangeRequest : Entity
         CurrentStep = currentStep;
     }
 
-    public static Result<EmailChangeRequest> StartTraditional(UserId userId, EmailAddress currentEmail,
+    internal static Result<EmailChangeRequest> StartTraditional(UserId userId, EmailAddress currentEmail,
         EmailAddress newEmail, IDateTimeProvider dateTimeProvider)
     {
         if (userId.IsEmpty())
@@ -78,7 +78,7 @@ public class EmailChangeRequest : Entity
         return Result.Success(request);
     }
 
-    public Result SetCurrentEmailOtp(int otp, string ipAddress, string userAgent)
+    internal Result SetCurrentEmailOtp(int otp, string ipAddress, string userAgent)
     {
         if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
             return Result.Failure(EmailChangeRequestErrors.InvalidIpAddress);
@@ -107,7 +107,7 @@ public class EmailChangeRequest : Entity
         return Result.Success();
     }
 
-    public Result VerifyCurrentAndTransitionToVerifyNew(int currentOtp, int newOtp, string ipAddress, string userAgent,
+    internal Result VerifyCurrentAndTransitionToVerifyNew(int currentOtp, int newOtp, string ipAddress, string userAgent,
         IDateTimeProvider dateTimeProvider)
     {
         if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
@@ -139,7 +139,7 @@ public class EmailChangeRequest : Entity
         return Result.Success();
     }
 
-    public Result VerifyNewAndComplete(int newOtp, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
+    internal Result VerifyNewAndComplete(int newOtp, string ipAddress, string userAgent, IDateTimeProvider dateTimeProvider)
     {
         if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Length > RequestMetadataConstants.MaxIpAddressLength)
             return Result.Failure(EmailChangeRequestErrors.InvalidIpAddress);

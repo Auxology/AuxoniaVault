@@ -22,7 +22,11 @@ public sealed class UserNameChangedBillingConsumer(
 
         var updateOptions = new CustomerUpdateOptions
         {
-            Name = message.NewName
+            Name = message.NewName,
+            Metadata = new Dictionary<string, string>
+            {
+                {"userId", message.UserId.ToString()},
+            }
         };
 
         UserId userId = UserId.UnsafeFromGuid(message.UserId);

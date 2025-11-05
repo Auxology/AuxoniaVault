@@ -9,7 +9,7 @@ namespace Billing.Infrastructure.Services;
 
 internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSettings, SessionService sessionService ,SubscriptionService subscriptionService) : IStripeCheckoutService
 {
-    public async Task<Result<string>> CreateCheckoutSessionAsync(string customerId, string priceId,
+    public async Task<Result<string>> CreateCheckoutSessionAsync(string customerId,  string userId, string priceId,
         CancellationToken cancellationToken)
     {
         try
@@ -36,7 +36,8 @@ internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSetti
                 {
                     Metadata = new Dictionary<string, string>
                     {
-                        { "customer_id", customerId }
+                        { "customer_id", customerId },
+                        { "userId", userId}
                     }
                 }
             };

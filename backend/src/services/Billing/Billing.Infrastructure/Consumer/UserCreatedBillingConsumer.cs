@@ -31,7 +31,10 @@ public sealed class UserCreatedBillingConsumer(
         {
             Email = message.Email,
             Name = message.Name,
-                   
+            Metadata = new Dictionary<string, string>
+            {
+                {"userId", message.UserId.ToString()},
+            }
         };
 
         var requestOptions = new RequestOptions

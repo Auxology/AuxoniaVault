@@ -91,7 +91,7 @@ public static class DependencyInjection
         {
             var jobKey = new JobKey("ExpiredSessionCleanup");
             configure
-                .AddJob<ExpiredSessionCleanupJob>(jobKey)
+                .AddJob<ExpiredSessionCleanupJob>(jobKey, (Action<IJobConfigurator>?)null)
                 .AddTrigger(trigger =>
                     trigger.ForJob(jobKey)
                         .WithIdentity("ExpiredSessionCleanup-trigger")
@@ -101,7 +101,7 @@ public static class DependencyInjection
 
             var loginVerificationJobKey = new JobKey("ExpiredLoginVerificationCleanup");
             configure
-                .AddJob<ExpiredLoginVerificationCleanupJob>(loginVerificationJobKey)
+                .AddJob<ExpiredLoginVerificationCleanupJob>(loginVerificationJobKey, (Action<IJobConfigurator>?)null)
                 .AddTrigger(trigger =>
                     trigger.ForJob(loginVerificationJobKey)
                         .WithIdentity("ExpiredLoginVerificationCleanup-trigger")

@@ -38,6 +38,7 @@ internal sealed class CreateCheckoutCommandHandler(
         var checkoutSessionResult = await stripeCheckoutService.CreateCheckoutSessionAsync
         (
             customer.StripeCustomerId,
+            userId.ToString(),
             request.PriceId,
             cancellationToken
         );
