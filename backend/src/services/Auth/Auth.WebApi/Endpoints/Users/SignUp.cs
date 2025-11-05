@@ -23,7 +23,7 @@ internal sealed class SignUp : IEndpoint
             
             var command = new SignUpCommand(request.Name, request.Email, requestMetadata);
 
-            Result<string[]> result = await sender.Send(command);
+            Result<SignUpCommandResponse> result = await sender.Send(command);
 
             return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
         })

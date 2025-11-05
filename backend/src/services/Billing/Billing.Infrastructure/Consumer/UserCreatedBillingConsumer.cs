@@ -1,5 +1,6 @@
 using Billing.Application.Abstractions.Database;
 using Billing.Domain.ValueObjects;
+using Billing.SharedKernel;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,8 @@ namespace Billing.Infrastructure.Consumer;
 public sealed class UserCreatedBillingConsumer(
     IBillingDbContext dbContext,
     CustomerService customerService,
+    IPublishEndpoint publishEndpoint,
+    IDateTimeProvider dateTimeProvider,
     ILogger<UserCreatedBillingConsumer> logger) : IConsumer<UserCreatedContract>
 {
     public async Task Consume(ConsumeContext<UserCreatedContract> context)
@@ -62,6 +65,15 @@ public sealed class UserCreatedBillingConsumer(
 
         await dbContext.SaveChangesAsync();
 
+        var customerTierInitializedContract = new CustomerTierInitializedContract
+        (
+            typedUserId.Value,
+            Tier: 0,
+            dateTimeProvider.UtcNow
+        );
+
+        await publishEndpoint.Publish(customerTierInitializedContract);
+        
         logger.LogInformation("Created Stripe customer with ID: {CustomerId} for User ID: {UserId}", customer.Id, message.UserId);
     }
 }

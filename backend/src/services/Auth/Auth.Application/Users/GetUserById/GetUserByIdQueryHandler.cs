@@ -21,12 +21,14 @@ internal sealed class GetUserByIdQueryHandler(IAuthDbContext context, IUserConte
         UserResponse? user = await context.Users
             .Where(u => u.Id == userId)
             .Select(u => new UserResponse
-            {
-                Id = u.Id.Value,
-                Email = u.Email.Value,
-                Name = u.Name,
-                Avatar = u.Avatar
-            })
+            (
+                u.Id.Value,
+                u.Email.Value,
+                u.Name,
+                u.Avatar,
+                u.CreatedAt,
+                u.UpdatedAt
+            ))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)

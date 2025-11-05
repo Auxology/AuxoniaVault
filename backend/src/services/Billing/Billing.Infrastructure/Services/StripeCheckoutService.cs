@@ -9,7 +9,7 @@ namespace Billing.Infrastructure.Services;
 
 internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSettings, SessionService sessionService ,SubscriptionService subscriptionService) : IStripeCheckoutService
 {
-    public async Task<Result<string>> CreateCheckoutSessionAsync(string customerId,  string userId, string priceId,
+    public async Task<Result<string>> CreateCheckoutSessionAsync(string customerId, string userId, string stripePriceId,
         CancellationToken cancellationToken)
     {
         try
@@ -21,7 +21,7 @@ internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSetti
                 {
                     new()
                     {
-                        Price = priceId,
+                        Price = stripePriceId,
                         Quantity = 1
                     }
                 },
@@ -39,7 +39,7 @@ internal sealed class StripeCheckoutService(IOptions<StripeSettings> stripeSetti
                         { "customer_id", customerId },
                         { "userId", userId}
                     }
-                }
+                },
             };
              
             var session = await sessionService.CreateAsync(options, null, cancellationToken);

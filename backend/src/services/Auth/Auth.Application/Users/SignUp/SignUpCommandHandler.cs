@@ -10,17 +10,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Application.Users.SignUp;
 
-internal sealed class SignUpCommandHandler(IAuthDbContext context, IDateTimeProvider dateTimeProvider, IGenerator generator, ISecretHasher secretHasher) : ICommandHandler<SignUpCommand, string[]>
+internal sealed class SignUpCommandHandler(IAuthDbContext context, IDateTimeProvider dateTimeProvider, IGenerator generator, ISecretHasher secretHasher) : ICommandHandler<SignUpCommand, SignUpCommandResponse>
 {
-    public async Task<Result<string[]>> Handle(SignUpCommand request, CancellationToken cancellationToken)
+    public async Task<Result<SignUpCommandResponse>> Handle(SignUpCommand request, CancellationToken cancellationToken)
     {
         Result<EmailAddress> emailResult = EmailAddress.Create(request.Email);
 
         if (emailResult.IsFailure)
-            return Result.Failure<string[]>(emailResult.Error);
+            return Result.Failure<SignUpCommandResponse>(emailResult.Error);
 
         if (await context.Users.AnyAsync(u => u.Email == emailResult.Value, cancellationToken))
-            return Result.Failure<string[]>(UserErrors.EmailNotUnique);
+            return Result.Failure<SignUpCommandResponse>(UserErrors.EmailNotUnique);
 
         var metadata = request.RequestMetadata;
 
@@ -28,7 +28,7 @@ internal sealed class SignUpCommandHandler(IAuthDbContext context, IDateTimeProv
             dateTimeProvider);
 
         if (userResult.IsFailure)
-            return Result.Failure<string[]>(userResult.Error);
+            return Result.Failure<SignUpCommandResponse>(userResult.Error);
 
         User user = userResult.Value;
 
@@ -42,12 +42,18 @@ internal sealed class SignUpCommandHandler(IAuthDbContext context, IDateTimeProv
         Result recoveryCodesResult = user.CreateRecoveryCodes(hashedRecoveryCodes, dateTimeProvider);
         
         if (recoveryCodesResult.IsFailure)
-            return Result.Failure<string[]>(recoveryCodesResult.Error);
+            return Result.Failure<SignUpCommandResponse>(recoveryCodesResult.Error);
         
         await context.Users.AddAsync(user, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(plainRecoveryCodes);
+        var response = new SignUpCommandResponse
+        (
+            UserId: user.Id.Value, 
+            RecoveryCodes: plainRecoveryCodes
+        );
+
+        return Result.Success(response);
     }
 }

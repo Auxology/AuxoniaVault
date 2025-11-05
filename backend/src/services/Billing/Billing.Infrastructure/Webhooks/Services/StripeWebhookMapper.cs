@@ -17,7 +17,7 @@ internal sealed class StripeWebhookMapper(IDateTimeProvider dateTimeProvider) : 
         
         Price price = firstItem.Price;
         
-        string priceId = price.Id;
+        string stripePriceId = price.Id;
 
         string productName = price.Product switch
         {
@@ -33,7 +33,7 @@ internal sealed class StripeWebhookMapper(IDateTimeProvider dateTimeProvider) : 
         
         return new SubscriptionProductInfoViewModel
         (
-            priceId,
+            stripePriceId,
             productName,
             priceFormatted,
             currentPeriodStart,

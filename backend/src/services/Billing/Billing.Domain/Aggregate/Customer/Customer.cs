@@ -102,7 +102,7 @@ public class Customer : Entity, IAggregateRoot
         return Result.Success(subscriptionResult.Value);
     }
 
-    public Result ActivateSubscription(string stripeSubscriptionId, string productName, string priceFormatted, string eventType, DateTimeOffset currentPeriodStart,
+    public Result ActivateSubscription(string stripeSubscriptionId, string productName, string priceFormatted, string stripePriceId, string eventType, DateTimeOffset currentPeriodStart,
         DateTimeOffset currentPeriodEnd, IDateTimeProvider dateTimeProvider)
     {
         if (!Subscriptions.Any())
@@ -146,6 +146,7 @@ public class Customer : Entity, IAggregateRoot
             StripeCustomerName,
             StripeCustomerEmail,
             stripeSubscriptionId,
+            stripePriceId,
             productName,
             priceFormatted,
             currentPeriodStart,
@@ -258,8 +259,6 @@ public class Customer : Entity, IAggregateRoot
             stripeSubscriptionId,
             productName,
             priceFormatted,
-            currentPeriodStart,
-            currentPeriodEnd,
             utcNow
         ));
 

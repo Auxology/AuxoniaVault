@@ -38,16 +38,16 @@ internal sealed class GetCurrentSubscriptionQueryHandler(IBillingDbContext conte
 
         var currentSubscription = new CurrentSubscriptionReadModel
         (
-            activeSubscription.StripeSubscriptionId,
-            activeSubscription.Status.ToString(),
-            currentSubscriptionHistory.ProductName,
-            currentSubscriptionHistory.PriceFormatted,
-            activeSubscription.StripePriceId,
-            activeSubscription.CurrentPeriodStart,
-            activeSubscription.CurrentPeriodEnd,
-            activeSubscription.CancelAtPeriodEnd,
-            activeSubscription.CreatedAt,
-            activeSubscription.UpdatedAt
+            StripeSubscriptionId: activeSubscription.StripeSubscriptionId,
+            Status: activeSubscription.Status.ToString(),
+            ProductName: currentSubscriptionHistory.ProductName,
+            PriceFormatted: currentSubscriptionHistory.PriceFormatted,
+            StripePriceId: activeSubscription.StripePriceId,
+            CurrentPeriodStart: activeSubscription.CurrentPeriodStart,
+            CurrentPeriodEnd: activeSubscription.CurrentPeriodEnd,
+            CancelAtPeriodEnd: activeSubscription.CancelAtPeriodEnd,
+            CreatedAt: activeSubscription.CreatedAt,
+            UpdatedAt: activeSubscription.UpdatedAt
         );
         
         return Result.Success(currentSubscription);

@@ -3,9 +3,15 @@ using Auth.Application.Abstractions.Messaging;
 
 namespace Auth.Application.Users.SignUp;
 
-public record SignUpCommand
+public sealed record SignUpCommand
 (
     string Name,
     string Email,
     RequestMetadata RequestMetadata
-) : ICommand<string[]>;
+) : ICommand<SignUpCommandResponse>;
+
+public sealed record SignUpCommandResponse
+(
+    Guid UserId,
+    IReadOnlyList<string> RecoveryCodes
+);

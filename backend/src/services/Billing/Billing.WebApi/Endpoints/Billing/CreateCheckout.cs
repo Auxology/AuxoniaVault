@@ -7,7 +7,7 @@ namespace Billing.WebApi.Endpoints.Billing;
 
 internal sealed class CreateCheckout : IEndpoint
 {
-    private sealed record Request(string PriceId);
+    private sealed record Request(string StripePriceId);
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -18,7 +18,7 @@ internal sealed class CreateCheckout : IEndpoint
             Request request
         ) =>
         {
-            var command = new CreateCheckoutCommand(request.PriceId);
+            var command = new CreateCheckoutCommand(request.StripePriceId);
 
             Result<string> result = await sender.Send(command);
 

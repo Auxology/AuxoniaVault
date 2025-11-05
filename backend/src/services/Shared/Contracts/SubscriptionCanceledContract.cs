@@ -1,6 +1,6 @@
 namespace Shared.Contracts;
 
-public sealed record SubscriptionActivatedContract
+public sealed record SubscriptionCanceledContract
 (
     Guid UserId,
     string StripeCustomerName,
@@ -8,6 +8,5 @@ public sealed record SubscriptionActivatedContract
     int Tier,
     string PriceFormatted,
     string PlanName,
-    DateTimeOffset CurrentPeriodStart,
-    DateTimeOffset CurrentPeriodEnd
+    DateTimeOffset CanceledAt
 );

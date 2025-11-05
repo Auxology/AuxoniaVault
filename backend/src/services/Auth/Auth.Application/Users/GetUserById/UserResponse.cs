@@ -1,12 +1,10 @@
-namespace Auth.Application.Users.GetUser;
+namespace Auth.Application.Users.GetUserById;
 
-public sealed record UserResponse
-{
-    public Guid Id { get; init; }
-
-    public string Email { get; init; }
-
-    public string Name { get; init; }
-
-    public string? Avatar { get; init; }
-}
+public sealed record UserResponse(
+    Guid Id,
+    string Email,
+    string Name,
+    string? AvatarUrl,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? UpdatedAt
+);
