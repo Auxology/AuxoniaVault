@@ -21,4 +21,10 @@ internal static class AccountErrors
         "Accounts.AccountEmailRequired",
         "The account email is required."
     );
+    
+    public static Error InvalidAccountTier => Error.Validation
+    (
+        "Accounts.InvalidAccountTier",
+        "The account tier is invalid."
+    );
 }

@@ -21,7 +21,7 @@ public sealed class UserCreatedMainConsumer
         logger.LogInformation("Received UserCreatedContract for User ID: {UserId}, Email: {Email}",
             context.Message.UserId, context.Message.Email);
 
-        var message = context.Message;
+        UserCreatedContract message = context.Message;
         
         UserId userId = UserId.UnsafeFromGuid(message.UserId);
         

@@ -66,4 +66,26 @@ public sealed class Account : Entity, IAggregateRoot
         
         return Result.Success(account);
     }
+
+    public Result ChangeTier(int newTier, IDateTimeProvider dateTimeProvider)
+    {
+        if (newTier < 0)
+            return Result.Failure(AccountErrors.InvalidAccountTier);
+        
+        if (AccountTier == newTier)
+            return Result.Success();
+        
+        AccountTier = newTier;
+
+        MaxStorageInBytes = newTier switch
+        {
+            AccountConstants.FreeTier => AccountConstants.MaxStorageInBytesFreeTier,
+            AccountConstants.ProTier => AccountConstants.MaxStorageInBytesProTier,
+            _ => MaxStorageInBytes
+        };
+        
+        UpdatedAt = dateTimeProvider.UtcNow;
+        
+        return Result.Success();
+    }
 }
