@@ -8,6 +8,7 @@ using Billing.Infrastructure.Authentication;
 using Billing.Infrastructure.Database;
 using Billing.Infrastructure.DomainEvents;
 using Billing.Infrastructure.IntegrationEvents.SubscriptionActivated;
+using Billing.Infrastructure.IntegrationEvents.SubscriptionCanceled;
 using Billing.Infrastructure.Services;
 using Billing.Infrastructure.Settings;
 using Billing.Infrastructure.Time;
@@ -194,6 +195,9 @@ public static class DependencyInjection
     {
         services.AddTransient<INotificationHandler<DomainEventNotification<SubscriptionActivatedDomainEvent>>,
             SubscriptionActivatedDomainEventHandler>();
+        
+        services.AddTransient<INotificationHandler<DomainEventNotification<SubscriptionCanceledDomainEvent>>,
+            SubscriptionCanceledDomainEventHandler>();
         
         return services;
     }
