@@ -1,5 +1,7 @@
 using Billing.Application.Abstractions.Messaging;
+using Billing.Domain.Aggregate.Customer;
 using Billing.Domain.Events;
+using Billing.Infrastructure.Services;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -7,17 +9,24 @@ using Shared.Contracts;
 
 namespace Billing.Infrastructure.IntegrationEvents.SubscriptionActivated;
 
-internal sealed class SubscriptionActivatedDomainEventHandler(IPublishEndpoint publishEndpoint, ILogger<SubscriptionActivatedDomainEventHandler> logger) : INotificationHandler<DomainEventNotification<SubscriptionActivatedDomainEvent>>
+internal sealed class SubscriptionActivatedDomainEventHandler(
+    IPublishEndpoint publishEndpoint,
+    ILogger<SubscriptionActivatedDomainEventHandler> logger,
+    IStripePriceTierMapper stripePriceTierMapper)
+    : INotificationHandler<DomainEventNotification<SubscriptionActivatedDomainEvent>>
 {
     public async Task Handle(DomainEventNotification<SubscriptionActivatedDomainEvent> notification, CancellationToken cancellationToken)
     {
         var domainEvent = notification.Event;
+        
+        int tier = stripePriceTierMapper.GetTierFromPriceId(domainEvent.StripePriceId);
 
         var contract = new SubscriptionActivatedContract
         (
             domainEvent.UserId,
             domainEvent.StripeCustomerName,
             domainEvent.StripeCustomerEmail,
+            tier,
             domainEvent.PriceFormatted,
             domainEvent.ProductName,
             domainEvent.CurrentPeriodStart,

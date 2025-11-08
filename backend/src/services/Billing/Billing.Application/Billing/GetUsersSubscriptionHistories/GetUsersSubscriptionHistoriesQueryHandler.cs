@@ -29,13 +29,13 @@ internal sealed class GetUsersSubscriptionHistoriesQueryHandler(IBillingDbContex
         List<SubscriptionHistoryReadModel> subscriptionHistories = customer.SubscriptionHistories
             .Select(sh => new SubscriptionHistoryReadModel
             (
-                sh.Id,
-                sh.StripeSubscriptionId,
-                sh.ProductName,
-                sh.PriceFormatted,
-                sh.EventType,
-                sh.PeriodStart,
-                sh.PeriodEnd
+                Id: sh.Id,
+                StripeSubscriptionId: sh.StripeSubscriptionId,
+                ProductName: sh.ProductName,
+                PriceFormatted: sh.PriceFormatted,
+                EventType: sh.EventType,
+                PeriodStart: sh.PeriodStart,
+                PeriodEnd: sh.PeriodEnd
             ))
             .ToList();
         

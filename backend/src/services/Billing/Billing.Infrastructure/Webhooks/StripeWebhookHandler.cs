@@ -126,7 +126,7 @@ public sealed class StripeWebhookHandler
         (
             session.CustomerId,
             subscription.Id,
-            productInfoViewModel.PriceId,
+            productInfoViewModel.StripePriceId,
             productInfoViewModel.ProductName,
             productInfoViewModel.PriceFormatted,
             stripeEvent.Type,

@@ -154,6 +154,7 @@ public static class DependencyInjection
         services.AddTransient<IStripeSubscriptionFetcher, StripeSubscriptionFetcher>();
         services.AddTransient<IStripeWebhookMapper, StripeWebhookMapper>();
         services.AddTransient<IStripeBillingPortalService, StripeBillingPortalService>();
+        services.AddSingleton<IStripePriceTierMapper, StripePriceTierMapper>();
         services.AddScoped<StripeWebhookHandler>();
 
         return services;

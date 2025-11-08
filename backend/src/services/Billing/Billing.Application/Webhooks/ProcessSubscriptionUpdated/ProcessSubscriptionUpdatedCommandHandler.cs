@@ -24,9 +24,9 @@ internal sealed class ProcessSubscriptionUpdatedCommandHandler(IBillingDbContext
         {
             updateResult = customer.CancelSubscriptionAtPeriodEnd
             (
-                request.StripeSubscriptionId,
-                request.CurrentPeriodStart,
-                request.CurrentPeriodEnd,
+                stripeSubscriptionId: request.StripeSubscriptionId,
+                currentPeriodEnd: request.CurrentPeriodEnd,
+                currentPeriodStart: request.CurrentPeriodStart,
                 dateTimeProvider
             );
         }
@@ -34,11 +34,11 @@ internal sealed class ProcessSubscriptionUpdatedCommandHandler(IBillingDbContext
         {
             updateResult = customer.UpdateSubscription
             (
-                request.StripeSubscriptionId,
-                request.Status,
-                request.CurrentPeriodStart,
-                request.CurrentPeriodEnd,
-                request.CancelAtPeriodEnd,
+                stripeSubscriptionId: request.StripeSubscriptionId,
+                newStatus: request.Status,
+                currentPeriodStart: request.CurrentPeriodStart,
+                currentPeriodEnd: request.CurrentPeriodEnd,
+                cancelAtPeriodEnd: request.CancelAtPeriodEnd,
                 dateTimeProvider
             );
         }

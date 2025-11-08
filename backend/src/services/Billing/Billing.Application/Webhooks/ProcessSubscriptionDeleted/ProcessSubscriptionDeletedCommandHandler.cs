@@ -20,11 +20,11 @@ internal sealed class ProcessSubscriptionDeletedCommandHandler(IBillingDbContext
 
         Result cancelResult = customer.CompleteSubscriptionCancellation
         (
-            request.StripeSubscriptionId,
-            request.ProductName,
-            request.PriceFormatted,
-            request.CurrentPeriodEnd,
-            request.CurrentPeriodStart,
+            stripeSubscriptionId: request.StripeSubscriptionId,
+            productName: request.ProductName,
+            priceFormatted: request.PriceFormatted,
+            currentPeriodEnd: request.CurrentPeriodEnd,
+            currentPeriodStart: request.CurrentPeriodStart,
             dateTimeProvider
         );
         

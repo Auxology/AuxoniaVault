@@ -8,6 +8,7 @@ public sealed record SubscriptionActivatedDomainEvent
     string StripeCustomerName,
     string StripeCustomerEmail,
     string StripeSubscriptionId,
+    string StripePriceId,
     string ProductName,
     string PriceFormatted,
     DateTimeOffset CurrentPeriodStart,

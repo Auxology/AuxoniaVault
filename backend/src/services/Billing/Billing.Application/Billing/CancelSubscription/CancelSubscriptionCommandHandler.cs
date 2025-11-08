@@ -41,8 +41,13 @@ internal sealed class CancelSubscriptionCommandHandler(
         if (stripeResult.IsFailure)
             return Result.Failure(stripeResult.Error);
 
-        Result domainResult = customer.CancelSubscriptionAtPeriodEnd(subscription.StripeSubscriptionId,
-            subscription.CurrentPeriodEnd, subscription.CurrentPeriodStart, dateTimeProvider);
+        Result domainResult = customer.CancelSubscriptionAtPeriodEnd
+        (
+            stripeSubscriptionId: subscription.StripeSubscriptionId,
+            currentPeriodEnd: subscription.CurrentPeriodEnd,
+             currentPeriodStart: subscription.CurrentPeriodStart,
+            dateTimeProvider
+        );
         
         if (domainResult.IsFailure)
             return Result.Failure(domainResult.Error);

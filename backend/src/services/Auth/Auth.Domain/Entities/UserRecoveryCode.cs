@@ -25,7 +25,7 @@ public class UserRecoveryCode : Entity
         CreatedAt = utcNow;
     }
 
-    public static Result<UserRecoveryCode> Create(UserId userId, string hashedCode, IDateTimeProvider dateTimeProvider)
+    internal static Result<UserRecoveryCode> Create(UserId userId, string hashedCode, IDateTimeProvider dateTimeProvider)
     {
         if (userId.IsEmpty())
             return Result.Failure<UserRecoveryCode>(UserRecoveryCodeErrors.UserIdRequired);

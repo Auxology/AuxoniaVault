@@ -5,7 +5,7 @@ namespace Billing.Infrastructure.Webhooks.ViewModels;
 
 public sealed record SubscriptionProductInfoViewModel
 (
-    string PriceId,
+    string StripePriceId,
     string ProductName,
     string PriceFormatted,
     DateTimeOffset CurrentPeriodStart,
@@ -14,7 +14,7 @@ public sealed record SubscriptionProductInfoViewModel
 {
     public static SubscriptionProductInfoViewModel Empty(IDateTimeProvider dateTimeProvider) => new
     (
-        PriceId: string.Empty,
+        StripePriceId: string.Empty,
         ProductName: WebhookConstants.DefaultProductName,
         PriceFormatted: WebhookConstants.DefaultPrice,
         CurrentPeriodStart: dateTimeProvider.UtcNow,

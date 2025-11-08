@@ -10,7 +10,5 @@ public sealed record SubscriptionCanceledDomainEvent
     string StripeSubscriptionId,
     string ProductName,
     string PriceFormatted,
-    DateTimeOffset CurrentPeriodStart,
-    DateTimeOffset CurrentPeriodEnd,
     DateTimeOffset CanceledAt
 ) : IDomainEvent;

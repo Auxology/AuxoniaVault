@@ -22,10 +22,10 @@ internal sealed class ProcessCheckoutSessionCompletedCommandHandler(IBillingDbCo
 
         Result<Subscription> subscriptionResult = customer.StartSubscription
         (
-            request.StripeSubscriptionId,
-            request.StripeCustomerId,
-            request.CurrentPeriodStart,
-            request.CurrentPeriodEnd,
+            stripeSubscriptionId: request.StripeSubscriptionId,
+            stripePriceId: request.StripePriceId,
+            currentPeriodStart: request.CurrentPeriodStart,
+            currentPeriodEnd: request.CurrentPeriodEnd,
             dateTimeProvider
         );
         
@@ -34,12 +34,13 @@ internal sealed class ProcessCheckoutSessionCompletedCommandHandler(IBillingDbCo
 
         Result activationResult = customer.ActivateSubscription
         (
-            request.StripeSubscriptionId,
-            request.ProductName,
-            request.PriceFormatted,
-            request.EventType,
-            request.CurrentPeriodStart,
-            request.CurrentPeriodEnd,
+            stripeSubscriptionId: request.StripeSubscriptionId,
+            productName: request.ProductName,
+            priceFormatted: request.PriceFormatted,
+            stripePriceId: request.StripePriceId,
+            eventType: request.EventType,
+            currentPeriodStart: request.CurrentPeriodStart,
+            currentPeriodEnd: request.CurrentPeriodEnd,
             dateTimeProvider
         );
         

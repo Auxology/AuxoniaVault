@@ -157,6 +157,7 @@ services:
       - Stripe__CancelUrl=${STRIPE_CANCEL_URL:-http://localhost:3000/subscription/cancel}
       - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET:-whsec_your_webhook_secret}
       - Stripe__BillingPortalReturnUrl=${STRIPE_BILLING_PORTAL_RETURN_URL:-http://localhost:3000/billing}
+      - Stripe__ProPriceId=${STRIPE_PRO_PRICE_ID:-price_your_pro_price_id}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     networks:
       - auxonia-network

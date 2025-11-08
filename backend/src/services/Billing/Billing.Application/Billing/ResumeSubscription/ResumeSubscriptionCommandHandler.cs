@@ -50,9 +50,9 @@ internal sealed class ResumeSubscriptionCommandHandler(
 
         Result updateResult = customer.ResumeSubscription
         (
-            request.StripeSubscriptionId,
-            subscription.CurrentPeriodStart,
-            subscription.CurrentPeriodEnd,
+            stripeSubscriptionId: request.StripeSubscriptionId,
+            currentPeriodStart: subscription.CurrentPeriodStart,
+            currentPeriodEnd: subscription.CurrentPeriodEnd,
             dateTimeProvider
         );
         

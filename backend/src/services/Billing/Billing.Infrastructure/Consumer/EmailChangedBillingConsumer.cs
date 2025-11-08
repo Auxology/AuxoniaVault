@@ -33,7 +33,11 @@ public sealed class EmailChangedBillingConsumer(
         
         var updateOptions = new CustomerUpdateOptions
         {
-            Email = message.NewEmail
+            Email = message.NewEmail,
+            Metadata = new Dictionary<string, string>
+            {
+                {"userId", message.UserId.ToString()},
+            }
         };
         
         await customerService.UpdateAsync(existingCustomer.StripeCustomerId, updateOptions);
