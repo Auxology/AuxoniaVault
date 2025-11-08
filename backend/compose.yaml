@@ -162,10 +162,57 @@ services:
     networks:
       - auxonia-network
 
+  main.database:
+    image: postgres:18.0
+    container_name: AuxoniaVault.MainDb
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-auxonia}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-auxonia}
+      - POSTGRES_DB=${MAIN_DB_NAME:-maindb}
+    ports:
+      - "5434:5432"
+    volumes:
+      - maindb-data:/var/lib/postgresql
+    networks:
+      - auxonia-network
+
+  main.webapi:
+    image: main.webapi
+    container_name: AuxoniaVault.MainApi
+    depends_on:
+      - main.database
+      - aspire-dashboard
+      - rabbitmq
+    build:
+      context: .
+      dockerfile: src/services/Main/Main.WebApi/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${MAIN_URL:-http://+:5400}
+      - ConnectionStrings__DefaultConnection=Host=main.database;Database=${MAIN_DB_NAME:-maindb};Username=${POSTGRES_USER:-auxonia};Password=${POSTGRES_PASSWORD:-auxonia}
+      - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
+      - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
+      - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
+      - AWS__Region=${AWS_REGION:-eu-central-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3Settings__BucketName=${S3_BUCKET_NAME:-auxoniabucket}
+      - S3Settings__RegionName=${S3_REGION_NAME:-eu-central-1}
+      - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__Port=${RABBITMQ_PORT:-5672}
+      - RabbitMQ__Username=${RABBITMQ_DEFAULT_USER:-auxonia}
+      - RabbitMQ__Password=${RABBITMQ_DEFAULT_PASS:-auxonia}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
+    networks:
+      - auxonia-network
+
 volumes:
   authdb-data:
     driver: local
   billingdb-data:
+    driver: local
+  maindb-data:
     driver: local
 
 networks:

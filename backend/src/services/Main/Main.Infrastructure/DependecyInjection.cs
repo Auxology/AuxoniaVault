@@ -1,36 +1,29 @@
 using System.Text;
-using Billing.Application.Abstractions.Authentication;
-using Billing.Application.Abstractions.Database;
-using Billing.Application.Abstractions.Messaging;
-using Billing.Application.Abstractions.Services;
-using Billing.Domain.Events;
-using Billing.Infrastructure.Authentication;
-using Billing.Infrastructure.Database;
-using Billing.Infrastructure.DomainEvents;
-using Billing.Infrastructure.IntegrationEvents.SubscriptionActivated;
-using Billing.Infrastructure.IntegrationEvents.SubscriptionCanceled;
-using Billing.Infrastructure.Services;
-using Billing.Infrastructure.Settings;
-using Billing.Infrastructure.Time;
-using Billing.Infrastructure.Webhooks;
-using Billing.Infrastructure.Webhooks.Services;
-using Billing.SharedKernel;
+using Amazon.S3;
+using Main.Application.Abstractions.Authentication;
+using Main.Application.Abstractions.Database;
+using Main.Application.Abstractions.Storage;
+using Main.Infrastructure.Authentication;
+using Main.Infrastructure.Database;
+using Main.Infrastructure.DomainEvents;
+using Main.Infrastructure.Storage;
+using Main.Infrastructure.Time;
+using Main.SharedKernel;
 using MassTransit;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Stripe;
 
-namespace Billing.Infrastructure;
+namespace Main.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -40,16 +33,16 @@ public static class DependencyInjection
             .AddOtel()
             .AddServices()
             .AddDatabase(configuration)
-            .AddStripe(configuration)
             .AddMassTransit(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
+            .AddStorage(configuration)
             .AddConsumers();
 
     private static IServiceCollection AddOtel(this IServiceCollection services)
     {
         services.AddOpenTelemetry()
-            .ConfigureResource(r => r.AddService("BillingService"))
+            .ConfigureResource(r => r.AddService("MainService"))
             .WithMetrics(metrics => 
                 metrics
                     .AddAspNetCoreInstrumentation()
@@ -90,14 +83,14 @@ public static class DependencyInjection
         if (connectionString is null)
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        services.AddDbContext<BillingDbContext>(options =>
+        services.AddDbContext<MainDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
 
             options.UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped<IBillingDbContext>(provider => provider.GetRequiredService<BillingDbContext>());
+        services.AddScoped<IMainDbContext>(provider => provider.GetRequiredService<MainDbContext>());
 
         return services;
     }
@@ -132,35 +125,6 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration configuration)
-    {
-        var stripeApiKey = configuration["Stripe:ApiKey"];
-
-        if (string.IsNullOrEmpty(stripeApiKey))
-            throw new InvalidOperationException("Stripe API key is not configured.");
-
-        StripeConfiguration.ApiKey = stripeApiKey;
-
-        services.AddSingleton<IStripeClient>(new StripeClient(stripeApiKey));
-        services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
-        
-        services.AddSingleton<SubscriptionService>();
-        services.AddSingleton<Stripe.Checkout.SessionService>();
-        services.AddSingleton<Stripe.BillingPortal.SessionService>();
-        services.AddSingleton<CustomerService>();
-        services.AddSingleton<ProductService>();
-        services.AddSingleton<PriceService>();
-        
-        services.AddTransient<IStripeCheckoutService, StripeCheckoutService>();
-        services.AddTransient<IStripeSubscriptionFetcher, StripeSubscriptionFetcher>();
-        services.AddTransient<IStripeWebhookMapper, StripeWebhookMapper>();
-        services.AddTransient<IStripeBillingPortalService, StripeBillingPortalService>();
-        services.AddSingleton<IStripePriceTierMapper, StripePriceTierMapper>();
-        services.AddScoped<StripeWebhookHandler>();
-
-        return services;
-    }
-
     private static IServiceCollection AddMassTransit(this IServiceCollection services, IConfiguration configuration)
     {
         var rabbitMqHost = configuration["RabbitMQ:Host"];
@@ -190,15 +154,30 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
+    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
+
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var s3Settings = sp.GetRequiredService<IOptions<S3Settings>>().Value;
+
+            var config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(s3Settings.RegionName)
+            };
+
+            return new AmazonS3Client(config);
+        });
+
+        services.AddScoped<IStorageServices, StorageServices>();
+
+        return services;
+    }
+
     private static IServiceCollection AddConsumers(this IServiceCollection services)
     {
-        services.AddTransient<INotificationHandler<DomainEventNotification<SubscriptionActivatedDomainEvent>>,
-            SubscriptionActivatedDomainEventHandler>();
-        
-        services.AddTransient<INotificationHandler<DomainEventNotification<SubscriptionCanceledDomainEvent>>,
-            SubscriptionCanceledDomainEventHandler>();
-        
         return services;
     }
 }

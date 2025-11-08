@@ -1,0 +1,18 @@
+using Main.SharedKernel;
+
+namespace Main.Infrastructure.Storage;
+
+internal static class StorageErrors
+{
+    public static Error UploadFailed => Error.Failure
+    (
+        "Storage.UploadFailed",
+        "An error occurred while uploading the file to storage."
+    );
+    
+    public static Error UnexpectedError => Error.Failure
+    (
+        "Storage.UnexpectedError",
+        "An unexpected error occurred in the storage service."
+    );
+}
