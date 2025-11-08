@@ -27,4 +27,16 @@ internal static class AccountErrors
         "Accounts.InvalidAccountTier",
         "The account tier is invalid."
     );
+    
+    public static Error InvalidFileSize => Error.Validation
+    (
+        "Accounts.InvalidFileSize",
+        "The file size is invalid."
+    );
+    
+    public static Error ExceedsStorageLimit => Error.Conflict
+    (
+        "Accounts.ExceedsStorageLimit",
+        "The file upload would exceed the account's storage limit."
+    );
 }

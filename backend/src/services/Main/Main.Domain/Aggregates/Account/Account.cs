@@ -88,4 +88,17 @@ public sealed class Account : Entity, IAggregateRoot
         
         return Result.Success();
     }
+
+    public Result<bool> CanUploadFile(long fileSize)
+    {
+        if (fileSize <= 0)
+            return Result.Failure<bool>(AccountErrors.InvalidFileSize);
+        
+        long projectedUsage = UsedStorageInBytes + fileSize;
+        
+        if (projectedUsage > MaxStorageInBytes)
+            return Result.Failure<bool>(AccountErrors.ExceedsStorageLimit);
+        
+        return Result.Success(true);
+    }
 }
