@@ -1,5 +1,6 @@
 using Amazon.S3;
 using Auth.Application.Abstractions.Storage;
+using Auth.SharedKernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,7 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
 {
     private const string UserProfilePictures = "images/users/profile-pictures";
 
-    public async Task<string> PutObjectAsync(IFormFile file, CancellationToken cancellationToken)
+    public async Task<Result<string>> PutObjectAsync(IFormFile file, CancellationToken cancellationToken)
     {
         try
         {
@@ -32,14 +33,14 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
 
             await amazonS3.PutObjectAsync(putObjectRequest, cancellationToken);
 
-            return key;
+            return Result.Success(key);
         }
 
         catch (Exception exception)
         {
             logger.LogError(exception, "An error occurred while uploading the file to S3.");
 
-            throw new Exception("An error occurred while uploading the file to S3.");
+            return Result.Failure<string>(StorageErrors.UploadFailed);
         }
     }
 }

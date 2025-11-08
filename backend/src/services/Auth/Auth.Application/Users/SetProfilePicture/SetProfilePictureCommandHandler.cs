@@ -27,9 +27,12 @@ internal sealed class SetProfilePictureCommandHandler(
         if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
 
-        var key = await storageServices.PutObjectAsync(request.File, cancellationToken);
+        Result<string> putObjectResult = await storageServices.PutObjectAsync(request.File, cancellationToken);
 
-        user.SetProfilePicture(key, dateTimeProvider);
+        if (putObjectResult.IsFailure)
+            return Result.Failure(putObjectResult.Error);
+        
+        user.SetProfilePicture(putObjectResult.Value, dateTimeProvider);
 
         await context.SaveChangesAsync(cancellationToken);
 
