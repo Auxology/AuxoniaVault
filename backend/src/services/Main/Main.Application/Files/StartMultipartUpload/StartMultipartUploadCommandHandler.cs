@@ -13,9 +13,9 @@ namespace Main.Application.Files.StartMultipartUpload;
 internal sealed class StartMultipartUploadCommandHandler(
     IMainDbContext context,
     IUserContext userContext,
-    IStorageServices storageServices) : ICommandHandler<StartMultipartUploadCommand, string>
+    IStorageServices storageServices) : ICommandHandler<StartMultipartUploadCommand, StartMultipartUploadResponse>
 {
-    public async Task<Result<string>> Handle(StartMultipartUploadCommand request, CancellationToken cancellationToken)
+    public async Task<Result<StartMultipartUploadResponse>> Handle(StartMultipartUploadCommand request, CancellationToken cancellationToken)
     {
         UserId userId = UserId.UnsafeFromGuid(userContext.UserId);
 
@@ -23,18 +23,29 @@ internal sealed class StartMultipartUploadCommandHandler(
             .FirstOrDefaultAsync(a => a.Id == userId, cancellationToken);
         
         if (account is null)
-            return Result.Failure<string>(AccountErrors.NotFound);
+            return Result.Failure<StartMultipartUploadResponse>(AccountErrors.NotFound);
         
         Result<bool> canUpload = account.CanUploadFile(request.FileSize);
         
         if (canUpload.IsFailure)
-            return Result.Failure<string>(canUpload.Error);
-
-        var uploadId =
-            await storageServices.StartMultiPartUploadAsync(request.FileName, request.ContentType, cancellationToken);
+            return Result.Failure<StartMultipartUploadResponse>(canUpload.Error);
         
         await context.SaveChangesAsync(cancellationToken);
+        
+        Result<StartS3Response> startResult = await storageServices.StartMultiPartUploadAsync(userId.ToString(),
+            request.FileName, request.ContentType, cancellationToken);
 
-        return Result.Success(uploadId);
+        if (startResult.IsFailure)
+        {
+            return Result.Failure<StartMultipartUploadResponse>(startResult.Error);
+        }
+        
+        var response = new StartMultipartUploadResponse
+        (
+            FileKey: startResult.Value.FileKey,
+            UploadId: startResult.Value.UploadId
+        );
+        
+        return Result.Success(response);
     }
 }

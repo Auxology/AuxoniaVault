@@ -194,6 +194,11 @@ services:
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
       - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
+      - AWS__Region=${AWS_REGION:-eu-central-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3Settings__BucketName=${S3_BUCKET_NAME:-auxoniabucket}
+      - S3Settings__RegionName=${S3_REGION_NAME:-eu-central-1}
       - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
       - RabbitMQ__Port=${RABBITMQ_PORT:-5672}
       - RabbitMQ__Username=${RABBITMQ_DEFAULT_USER:-auxonia}

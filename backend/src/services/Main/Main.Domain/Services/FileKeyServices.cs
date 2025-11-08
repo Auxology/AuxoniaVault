@@ -5,7 +5,7 @@ namespace Main.Domain.Services;
 
 public static class FileKeyServices
 {
-    public static string CreateFileKey(UserId userId, string fileName, IDateTimeProvider dateTimeProvider)
+    public static string CreateFileKey(string userId, string fileName, IDateTimeProvider dateTimeProvider)
     {
         var fileId = Guid.NewGuid();
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;
@@ -15,7 +15,7 @@ public static class FileKeyServices
         return $"{userId}/{utcNow:yyyy/MM/dd}/{fileId}{extension}";
     }
     
-    public static string CreateFileKeyWithoutExtension(UserId userId, IDateTimeProvider dateTimeProvider)
+    public static string CreateFileKeyWithoutExtension(string userId, IDateTimeProvider dateTimeProvider)
     {
         var fileId = Guid.NewGuid();
         DateTimeOffset utcNow = dateTimeProvider.UtcNow;

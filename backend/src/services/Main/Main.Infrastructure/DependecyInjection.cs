@@ -1,9 +1,12 @@
 using System.Text;
+using Amazon.S3;
 using Main.Application.Abstractions.Authentication;
 using Main.Application.Abstractions.Database;
+using Main.Application.Abstractions.Storage;
 using Main.Infrastructure.Authentication;
 using Main.Infrastructure.Database;
 using Main.Infrastructure.DomainEvents;
+using Main.Infrastructure.Storage;
 using Main.Infrastructure.Time;
 using Main.SharedKernel;
 using MassTransit;
@@ -12,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OpenTelemetry;
@@ -32,6 +36,7 @@ public static class DependencyInjection
             .AddMassTransit(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
+            .AddStorage(configuration)
             .AddConsumers();
 
     private static IServiceCollection AddOtel(this IServiceCollection services)
@@ -149,7 +154,28 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
+    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
+
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var s3Settings = sp.GetRequiredService<IOptions<S3Settings>>().Value;
+
+            var config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(s3Settings.RegionName)
+            };
+
+            return new AmazonS3Client(config);
+        });
+
+        services.AddScoped<IStorageServices, StorageServices>();
+
+        return services;
+    }
+
     private static IServiceCollection AddConsumers(this IServiceCollection services)
     {
         return services;

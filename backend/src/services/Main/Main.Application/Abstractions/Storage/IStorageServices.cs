@@ -1,6 +1,13 @@
+using Main.Domain.Objects;
+using Main.SharedKernel;
+
 namespace Main.Application.Abstractions.Storage;
 
 public interface IStorageServices
 {
-    Task<string> StartMultiPartUploadAsync(string fileName, string contentType, CancellationToken cancellationToken);
+    Task<Result<StartS3Response>> StartMultiPartUploadAsync(string userId, string fileName, string contentType, CancellationToken cancellationToken);
+    
+    Task<Result<string>> GetPresignedUrlAsync(string userId, string fileKey, string uploadId, int partNumber, CancellationToken cancellationToken);
+    
+    Task<Result<string>> CompleteMultiPartUploadAsync(string userId, string fileKey, string uploadId, List<PartETag> partETags, CancellationToken cancellationToken);
 }

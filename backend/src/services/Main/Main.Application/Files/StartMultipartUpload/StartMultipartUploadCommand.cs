@@ -7,4 +7,10 @@ public sealed record StartMultipartUploadCommand
     string FileName,
     long FileSize,
     string ContentType
-) : ICommand<string>;
+) : ICommand<StartMultipartUploadResponse>;
+
+public sealed record StartMultipartUploadResponse
+(
+    string FileKey,
+    string UploadId
+);
