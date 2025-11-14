@@ -10,7 +10,7 @@ internal sealed class LoginWithRefreshToken : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/refresh-token", async
+        app.MapPost("auth/refresh-token", async
         (
             HttpContext httpContext,
             ISender sender

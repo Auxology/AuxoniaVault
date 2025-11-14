@@ -12,7 +12,7 @@ internal sealed class VerifyLogin : IEndpoint
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/verify-login", async (
+        app.MapPost("auth/verify-login", async (
             VerifyLoginRequest request,
             HttpContext httpContext,
             ISender sender) =>
