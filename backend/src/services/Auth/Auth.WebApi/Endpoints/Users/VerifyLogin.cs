@@ -2,18 +2,18 @@ using Auth.Application.Users.VerifyLogin;
 using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
+using Shared.Requests;
+using VerifyLoginResponse = Shared.Requests.VerifyLoginResponse;
 
 namespace Auth.WebApi.Endpoints.Users;
 
 internal sealed class VerifyLogin : IEndpoint
 {
-    private sealed record Request(string Email, int Code);
-
-
+    
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost("api/auth/verify-login", async (
-            Request request,
+            VerifyLoginRequest request,
             HttpContext httpContext,
             ISender sender) =>
         {
@@ -26,9 +26,13 @@ internal sealed class VerifyLogin : IEndpoint
             if (result.IsFailure)
                 return CustomResults.Problem(result, httpContext);
 
-            httpContext.SetAuthenticationCookie(result.Value.RefreshToken);
+            VerifyLoginResponse response = new
+            (
+                AccessToken: result.Value.AccessToken,
+                RefreshToken: result.Value.RefreshToken
+            );
 
-            return Results.Ok(new {accessToken = result.Value.AccessToken});
+            return Results.Ok(response);
         })
         .WithTags(Tags.Users);
     }

@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:8.2
+    container_name: AuxoniaVault.Redis
+    ports:
+      - "6379:6379"
+    networks:
+      - auxonia-network
+  
   aspire-dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
     container_name: AuxoniaVault.AspireDashboard
@@ -24,6 +32,7 @@ services:
     container_name: AuxoniaVault.GatewayApi
     depends_on:
       - rabbitmq
+      - redis
     build:
       context: .
       dockerfile: src/gateway/Gateway.WebApi/Dockerfile
@@ -33,6 +42,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=${GATEWAY_URL:-http://+:5000}
+      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING:-redis:6379}
+      - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
+      - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
+      - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
     networks:
       - auxonia-network
 

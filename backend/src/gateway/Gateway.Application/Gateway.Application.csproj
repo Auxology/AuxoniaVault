@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Responses\" />
+      <ProjectReference Include="..\..\services\Shared\Shared.csproj" />
+      <ProjectReference Include="..\Gateway.SharedKernel\Gateway.SharedKernel.csproj" />
     </ItemGroup>
 
 </Project>
