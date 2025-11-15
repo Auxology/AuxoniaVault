@@ -25,9 +25,7 @@ internal sealed class LoginWithRefreshTokenCommandHandler(IAuthDbContext context
 
         if (user is null)
             return Result.Failure<LoginWithRefreshTokenResponse>(SessionErrors.UserNotFound);
-
-        string accessToken = tokenProvider.Create(user);
-
+        
         context.Sessions.Remove(session);
 
         string newRefreshToken = tokenProvider.CreateRefreshToken();
@@ -40,10 +38,14 @@ internal sealed class LoginWithRefreshTokenCommandHandler(IAuthDbContext context
             request.requestMetadata.UserAgent,
             dateTimeProvider
         );
-
+        
         if (newSessionResult.IsFailure)
             return Result.Failure<LoginWithRefreshTokenResponse>(newSessionResult.Error);
 
+        Guid sessionId = newSessionResult.Value.Id.Value;
+        
+        string accessToken = tokenProvider.Create(user, sessionId);
+        
         context.Sessions.Add(newSessionResult.Value);
 
         await context.SaveChangesAsync(cancellationToken);

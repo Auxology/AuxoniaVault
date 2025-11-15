@@ -30,9 +30,7 @@ internal sealed class VerifyLoginCommandHandler(IAuthDbContext context, ITokenPr
 
         if (loginVerification is null || loginVerification.ExpiresAt < dateTimeProvider.UtcNowForDatabaseComparison())
             return Result.Failure<VerifyLoginResponse>(LoginVerificationErrors.InvalidOrExpired);
-
-        string token = tokenProvider.Create(user);
-
+        
         string refreshToken = tokenProvider.CreateRefreshToken();
 
         Result<Session> sessionResult = Session.Create(user.Id, refreshToken, request.RequestMetadata.IpAddress,
@@ -41,6 +39,10 @@ internal sealed class VerifyLoginCommandHandler(IAuthDbContext context, ITokenPr
         if (sessionResult.IsFailure)
             return Result.Failure<VerifyLoginResponse>(sessionResult.Error);
 
+        Guid sessionId = sessionResult.Value.Id.Value;
+        
+        string token = tokenProvider.Create(user, sessionId);
+         
         var response = new VerifyLoginResponse(token, refreshToken);
 
         context.LoginVerifications.Remove(loginVerification);
