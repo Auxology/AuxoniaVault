@@ -46,7 +46,7 @@ services:
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
-      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-2}
       - HttpClientSettings__AuthServiceBaseUrl=${AUTH_FULL_URL:-http://auth.webapi:5100}
       - HttpClientSettings__AuthServiceVerifyLoginEndpoint=${AUTH_VERIFY_LOGIN_ENDPOINT:-auth/verify-login}
       - HttpClientSettings__AuthServiceLoginWithRefreshTokenEndpoint=${AUTH_REFRESH_TOKEN_ENDPOINT:-auth/refresh-token}
@@ -83,7 +83,7 @@ services:
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
-      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-2}
       - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
       - RabbitMQ__Port=${RABBITMQ_PORT:-5672}
       - RabbitMQ__Username=${RABBITMQ_DEFAULT_USER:-auxonia}

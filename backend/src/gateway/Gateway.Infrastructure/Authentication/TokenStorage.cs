@@ -15,7 +15,7 @@ internal sealed class TokenStorage(IDistributedCache distributedCache, IOptions<
         
         var options = new DistributedCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(jwtSettings.Value.ExpirationInMinutes - 1),
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(jwtSettings.Value.ExpirationInMinutes),
         };
 
         await distributedCache.SetStringAsync(refreshToken, accessToken, options, cancellationToken);
