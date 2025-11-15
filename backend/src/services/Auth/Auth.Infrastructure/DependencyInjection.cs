@@ -34,6 +34,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Quartz;
+using Shared.Abstractions.Authentication;
 
 namespace Auth.Infrastructure;
 
@@ -49,7 +50,8 @@ public static class DependencyInjection
             .AddMassTransit(configuration)
             .AddConsumers()
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal();
+            .AddAuthorizationInternal()
+            .AddRedisCache(configuration);
     
     private static IServiceCollection AddOtel(this IServiceCollection services)
     {
@@ -153,7 +155,8 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<ISecretHasher, SecretHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
-
+        services.AddScoped<ISessionBlacklistCache, SessionBlacklistCache>();
+        
         return services;
     }
 
@@ -235,6 +238,17 @@ public static class DependencyInjection
 
         services.AddScoped<IStorageServices, StorageServices>();
 
+        return services;
+    }
+
+    private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "AuxoniaVault";
+        });
+        
         return services;
     }
 }

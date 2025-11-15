@@ -46,7 +46,7 @@ services:
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
-      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-2}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
       - HttpClientSettings__AuthServiceBaseUrl=${AUTH_FULL_URL:-http://auth.webapi:5100}
       - HttpClientSettings__AuthServiceVerifyLoginEndpoint=${AUTH_VERIFY_LOGIN_ENDPOINT:-auth/verify-login}
       - HttpClientSettings__AuthServiceLoginWithRefreshTokenEndpoint=${AUTH_REFRESH_TOKEN_ENDPOINT:-auth/refresh-token}
@@ -73,6 +73,7 @@ services:
     depends_on:
       - auth.database
       - rabbitmq
+      - redis
     build:
       context: .
       dockerfile: src/services/Auth/Auth.WebApi/Dockerfile
@@ -80,10 +81,11 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=${AUTH_URL:-http://+:5100}
       - ConnectionStrings__DefaultConnection=Host=auth.database;Database=${AUTH_DB_NAME:-authdb};Username=${POSTGRES_USER:-auxonia};Password=${POSTGRES_PASSWORD:-auxonia}
+      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING:-redis:6379}
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
-      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-2}
+      - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
       - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
       - RabbitMQ__Port=${RABBITMQ_PORT:-5672}
       - RabbitMQ__Username=${RABBITMQ_DEFAULT_USER:-auxonia}
@@ -149,6 +151,7 @@ services:
       - billing.database
       - aspire-dashboard
       - rabbitmq
+      - redis
     build:
       context: .
       dockerfile: src/services/Billing/Billing.WebApi/Dockerfile
@@ -156,6 +159,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=${BILLING_URL:-http://+:5300}
       - ConnectionStrings__DefaultConnection=Host=billing.database;Database=${BILLING_DB_NAME:-billingdb};Username=${POSTGRES_USER:-auxonia};Password=${POSTGRES_PASSWORD:-auxonia}
+      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING:-redis:6379}
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}
@@ -200,6 +204,7 @@ services:
       - main.database
       - aspire-dashboard
       - rabbitmq
+      - redis
     build:
       context: .
       dockerfile: src/services/Main/Main.WebApi/Dockerfile
@@ -207,6 +212,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=${MAIN_URL:-http://+:5400}
       - ConnectionStrings__DefaultConnection=Host=main.database;Database=${MAIN_DB_NAME:-maindb};Username=${POSTGRES_USER:-auxonia};Password=${POSTGRES_PASSWORD:-auxonia}
+      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING:-redis:6379}
       - Jwt__Secret=${JWT_SECRET:-super-duper-secret-value-that-should-be-in-user-secrets}
       - Jwt__Issuer=${JWT_ISSUER:-AuxoniaVault}
       - Jwt__Audience=${JWT_AUDIENCE:-AuxoniaVaultUsers}

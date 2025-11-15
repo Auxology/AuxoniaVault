@@ -22,6 +22,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Shared.Abstractions.Authentication;
 
 namespace Main.Infrastructure;
 
@@ -114,7 +115,8 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddScoped<IUserContext, UserContext>();
-
+        services.AddScoped<ISessionBlacklistCache, SessionBlacklistCache>();
+        
         return services;
     }
 
@@ -178,6 +180,17 @@ public static class DependencyInjection
 
     private static IServiceCollection AddConsumers(this IServiceCollection services)
     {
+        return services;
+    }
+    
+    private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "AuxoniaVault";
+        });
+        
         return services;
     }
 }
