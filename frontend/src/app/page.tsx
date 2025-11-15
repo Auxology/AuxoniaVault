@@ -1,8 +1,9 @@
+import { Header } from "@/features/marketing/components/elements/header";
+
 export default function Page() {
   return (
-    <div>
-      <h1>Welcome to Next.js!</h1>
-      <p>This is a simple page.</p>
-    </div>
+    <>
+      <Header />
+    </>
   );
 }
