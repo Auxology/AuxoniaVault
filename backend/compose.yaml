@@ -49,6 +49,7 @@ services:
       - Jwt__ExpirationInMinutes=${JWT_EXPIRATION_IN_MINUTES:-10}
       - HttpClientSettings__AuthServiceBaseUrl=${AUTH_FULL_URL:-http://auth.webapi:5100}
       - HttpClientSettings__AuthServiceVerifyLoginEndpoint=${AUTH_VERIFY_LOGIN_ENDPOINT:-auth/verify-login}
+      - HttpClientSettings__AuthServiceLoginWithRefreshTokenEndpoint=${AUTH_REFRESH_TOKEN_ENDPOINT:-auth/refresh-token}
     networks:
       - auxonia-network
 

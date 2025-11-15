@@ -1,4 +1,4 @@
-namespace Shared.Requests;
+namespace Shared.Responses;
 
 public sealed record VerifyLoginResponse
 (

@@ -7,4 +7,6 @@ public sealed class HttpClientSettings
     public string AuthServiceBaseUrl { get; init; }
     
     public string AuthServiceVerifyLoginEndpoint { get; init; }
+    
+    public string AuthServiceLoginWithRefreshTokenEndpoint { get; init; }
 }

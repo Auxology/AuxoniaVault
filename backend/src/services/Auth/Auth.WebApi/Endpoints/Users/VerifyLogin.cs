@@ -3,7 +3,7 @@ using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 using Shared.Requests;
-using VerifyLoginResponse = Shared.Requests.VerifyLoginResponse;
+using VerifyLoginResponse = Shared.Responses.VerifyLoginResponse;
 
 namespace Auth.WebApi.Endpoints.Users;
 
