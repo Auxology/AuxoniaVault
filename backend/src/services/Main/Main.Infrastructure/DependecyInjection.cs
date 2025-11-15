@@ -22,6 +22,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Shared.Abstractions.Authentication;
 
 namespace Main.Infrastructure;
 
@@ -109,12 +110,29 @@ public static class DependencyInjection
                     ValidAudience = configuration["Jwt:Audience"],
                     ClockSkew = TimeSpan.Zero
                 };
+                
+                o.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var blackListCache = context.HttpContext.RequestServices
+                            .GetRequiredService<ISessionBlacklistCache>();
+
+                        Guid sessionId = context.Principal.GetSessionId();
+
+                        bool isBlacklisted = await blackListCache.IsSessionBlacklistedAsync(sessionId);
+
+                        if (isBlacklisted)
+                            context.Fail("This session has been revoked.");
+                    }
+                };
             });
 
         services.AddHttpContextAccessor();
 
         services.AddScoped<IUserContext, UserContext>();
-
+        services.AddScoped<ISessionBlacklistCache, SessionBlacklistCache>();
+        
         return services;
     }
 
@@ -178,6 +196,17 @@ public static class DependencyInjection
 
     private static IServiceCollection AddConsumers(this IServiceCollection services)
     {
+        return services;
+    }
+    
+    private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "AuxoniaVault";
+        });
+        
         return services;
     }
 }
