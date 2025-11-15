@@ -1,7 +1,6 @@
 using Auth.Application.Abstractions.Messaging;
-using Auth.Application.Users.GetUserById;
 
-namespace Auth.Application.Users.GetUser;
+namespace Auth.Application.Users.GetUserById;
 
 public record GetUserByIdQuery
 (

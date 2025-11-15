@@ -1,4 +1,4 @@
-using Auth.Application.Users.GetUser;
+using Auth.Application.Users.GetUserById;
 using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;

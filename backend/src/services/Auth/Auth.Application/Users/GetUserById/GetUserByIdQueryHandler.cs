@@ -2,7 +2,6 @@ using Auth.Application.Abstractions.Authentication;
 using Auth.Application.Abstractions.Database;
 using Auth.Application.Abstractions.Messaging;
 using Auth.Application.Errors;
-using Auth.Application.Users.GetUser;
 using Auth.Domain.ValueObjects;
 using Auth.SharedKernel;
 using Microsoft.EntityFrameworkCore;
