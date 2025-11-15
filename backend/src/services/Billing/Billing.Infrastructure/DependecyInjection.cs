@@ -118,6 +118,22 @@ public static class DependencyInjection
                     ValidAudience = configuration["Jwt:Audience"],
                     ClockSkew = TimeSpan.Zero
                 };
+                
+                o.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var blackListCache = context.HttpContext.RequestServices
+                            .GetRequiredService<ISessionBlacklistCache>();
+
+                        Guid sessionId = context.Principal.GetSessionId();
+
+                        bool isBlacklisted = await blackListCache.IsSessionBlacklistedAsync(sessionId);
+
+                        if (isBlacklisted)
+                            context.Fail("This session has been revoked.");
+                    }
+                };
             });
 
         services.AddHttpContextAccessor();
