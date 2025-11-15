@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Auth.Infrastructure.Authentication;
 
@@ -15,7 +16,7 @@ internal static class ClaimsPrincipalExtensions
 
     public static Guid GetSessionId(this ClaimsPrincipal? principal)
     {
-        string? sessionId = principal?.FindFirstValue(ClaimTypes.Sid);
+        string? sessionId = principal?.FindFirstValue(JwtRegisteredClaimNames.Sid);
 
         return Guid.TryParse(sessionId, out Guid parsedSessionId) ?
             parsedSessionId :

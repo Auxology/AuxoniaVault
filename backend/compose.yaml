@@ -33,6 +33,7 @@ services:
     depends_on:
       - rabbitmq
       - redis
+      - auth.webapi
     build:
       context: .
       dockerfile: src/gateway/Gateway.WebApi/Dockerfile
@@ -74,6 +75,7 @@ services:
       - auth.database
       - rabbitmq
       - redis
+      - aspire-dashboard
     build:
       context: .
       dockerfile: src/services/Auth/Auth.WebApi/Dockerfile

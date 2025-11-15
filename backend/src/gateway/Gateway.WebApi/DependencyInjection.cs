@@ -21,6 +21,12 @@ public static class DependencyInjection
                     AuthorizedRequestTransform transform = new(bffAuthService);
                     await transform.ApplyAsync(transformContext);
                 });
+                
+                builderContext.AddResponseTransform(async transformContext =>
+                { 
+                    AuthorizedResponseTransform transform = new();
+                    await transform.ApplyAsync(transformContext);
+                });
             });
         
         services.AddProblemDetails();
