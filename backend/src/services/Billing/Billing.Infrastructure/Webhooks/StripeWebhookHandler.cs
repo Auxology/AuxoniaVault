@@ -1,4 +1,5 @@
 using Billing.Application.Abstractions.Database;
+using Billing.Application.Abstractions.Services;
 using Billing.Application.Webhooks.ProcessCheckoutSessionCompleted;
 using Billing.Application.Webhooks.ProcessSubscriptionDeleted;
 using Billing.Application.Webhooks.ProcessSubscriptionUpdated;
@@ -26,7 +27,7 @@ public sealed class StripeWebhookHandler
     IStripeSubscriptionFetcher stripeSubscriptionFetcher,
     IStripeWebhookMapper stripeWebhookMapper,
     ILogger<StripeWebhookHandler> logger
-)
+) : IStripeWebhookHandler
 {
     public async Task<Result> HandleAsync(string json, string signature, CancellationToken cancellationToken)
     {

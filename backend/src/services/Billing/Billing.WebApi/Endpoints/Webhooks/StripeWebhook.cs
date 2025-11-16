@@ -1,7 +1,6 @@
-using Billing.Infrastructure.Webhooks;
+using Billing.Application.Abstractions.Services;
 using Billing.SharedKernel;
 using Billing.WebApi.Infrastructure;
-using MediatR;
 
 namespace Billing.WebApi.Endpoints.Webhooks;
 
@@ -12,8 +11,7 @@ internal sealed class StripeWebhook : IEndpoint
         app.MapPost("api/billing/webhooks/stripe", async
         (
             HttpContext httpContext,
-            ISender sender,
-            StripeWebhookHandler stripeWebhookHandler,
+            IStripeWebhookHandler handler,
             CancellationToken cancellationToken
         ) =>
         {
@@ -29,7 +27,7 @@ internal sealed class StripeWebhook : IEndpoint
 
             string signature = signatureHeader.ToString();
 
-            Result result = await stripeWebhookHandler.HandleAsync(json, signature, cancellationToken);
+            Result result = await handler.HandleAsync(json, signature, cancellationToken);
 
             return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
         })
