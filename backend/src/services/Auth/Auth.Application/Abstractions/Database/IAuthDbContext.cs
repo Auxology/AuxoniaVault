@@ -20,6 +20,7 @@ public interface IAuthDbContext
     DbSet<UserRecoveryRequest> UserRecoveryRequests { get; }
     
     DbSet<AuditLog> AuditLogs { get; }
+    
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

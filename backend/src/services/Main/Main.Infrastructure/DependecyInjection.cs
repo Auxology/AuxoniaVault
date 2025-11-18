@@ -11,6 +11,7 @@ using Main.Infrastructure.Time;
 using Main.SharedKernel;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,7 @@ public static class DependencyInjection
             .AddOtel()
             .AddServices()
             .AddDatabase(configuration)
+            .AddRedisCache(configuration)
             .AddMassTransit(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
@@ -201,9 +203,14 @@ public static class DependencyInjection
     
     private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
     {
+        var redisConnection = configuration.GetConnectionString("Redis");
+        
+        if (string.IsNullOrWhiteSpace(redisConnection))
+            throw new InvalidOperationException("Connection string 'Redis' not found.");
+        
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("Redis");
+            options.Configuration = redisConnection;
             options.InstanceName = "AuxoniaVault";
         });
         

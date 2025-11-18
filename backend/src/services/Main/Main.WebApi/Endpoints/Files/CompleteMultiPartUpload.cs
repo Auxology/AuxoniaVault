@@ -7,7 +7,13 @@ namespace Main.WebApi.Endpoints.Files;
 
 internal sealed class CompleteMultipartUpload : IEndpoint
 {
-    private sealed record Request(string UploadId, List<PartETagDto> Parts);
+    private sealed record Request(
+        string UploadId,
+        List<PartETagDto> Parts,
+        string FileName,
+        long FileSizeInBytes,
+        string ContentType
+    );
     
     private sealed record PartETagDto(int PartNumber, string ETag);
     
@@ -25,7 +31,10 @@ internal sealed class CompleteMultipartUpload : IEndpoint
                 (
                     FileKey: key,
                     UploadId: request.UploadId,
-                    Parts: request.Parts.Select(p => new PartETag(p.PartNumber, p.ETag)).ToList()
+                    Parts: request.Parts.Select(p => new PartETag(p.PartNumber, p.ETag)).ToList(),
+                    FileName: request.FileName,
+                    FileSizeInBytes: request.FileSizeInBytes,
+                    ContentType: request.ContentType
                 );
             
                 var result = await sender.Send(command);
