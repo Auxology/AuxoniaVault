@@ -1,6 +1,6 @@
-namespace Main.Infrastructure.Search.DTOs;
+namespace Main.Application.Abstractions.DTOs;
 
-public class FileMetadataSearchResult
+public sealed record FileMetadataSearchResult
 (
     Guid Id,
     Guid OwnerId,

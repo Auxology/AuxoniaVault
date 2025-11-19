@@ -1,5 +1,5 @@
+using Main.Application.Abstractions.DTOs;
 using Main.Domain.Aggregates.FileMetadata;
-using Main.Infrastructure.Search.DTOs;
 using Main.Infrastructure.Search.Errors;
 using Main.Infrastructure.Search.Models;
 using Main.Infrastructure.Search.Services.Helpers;

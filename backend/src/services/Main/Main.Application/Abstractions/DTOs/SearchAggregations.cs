@@ -1,4 +1,4 @@
-namespace Main.Infrastructure.Search.DTOs;
+namespace Main.Application.Abstractions.DTOs;
 
 public sealed record SearchAggregations
 (

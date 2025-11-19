@@ -1,5 +1,5 @@
+using Main.Application.Abstractions.DTOs;
 using Main.Domain.Aggregates.FileMetadata;
-using Main.Infrastructure.Search.DTOs;
 using Main.SharedKernel;
 
 namespace Main.Infrastructure.Search.Services;
