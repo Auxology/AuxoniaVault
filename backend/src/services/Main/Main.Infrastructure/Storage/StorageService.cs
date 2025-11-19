@@ -137,4 +137,32 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
             return Result.Failure<string>(StorageErrors.UnexpectedError);
         }
     }
+
+    public async Task<Result> RemoveFileAsync(string fileKey, CancellationToken cancellationToken)
+    {
+        var formatedKey = $"{UserFiles}/{fileKey}";
+        
+        try
+        {
+            var request = new DeleteObjectRequest
+            {
+                BucketName = options.Value.BucketName,
+                Key = formatedKey
+            };
+            
+            await amazonS3.DeleteObjectAsync(request, cancellationToken);
+            
+            return Result.Success();
+        }
+        catch (AmazonS3Exception s3Exception)
+        {
+            logger.LogError(s3Exception, "S3 error removing file with key {FileKey}", fileKey);
+            return Result.Failure(StorageErrors.DeletionFailed);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected error removing file with key {FileKey}", fileKey);
+            return Result.Failure(StorageErrors.UnexpectedError);
+        }
+    }
 }

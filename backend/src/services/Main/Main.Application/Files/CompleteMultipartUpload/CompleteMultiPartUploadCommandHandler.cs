@@ -51,16 +51,24 @@ internal sealed class CompleteMultiPartUploadCommandHandler
             dateTimeProvider: dateTimeProvider
         );
 
-        if (fileResult.IsFailure)
+        if (fileResult.IsSuccess)
         {
-            // TODO: Remove the uploaded file from storage since metadata creation failed
-            return Result.Failure<string>(fileResult.Error);
+            await context.Files.AddAsync(fileResult.Value, cancellationToken);
+        
+            await context.SaveChangesAsync(cancellationToken);
+        
+            return Result.Success(completeMultiPartResult.Value);
         }
         
-        await context.Files.AddAsync(fileResult.Value, cancellationToken);
+        Result removeResult = await storageServices.RemoveFileAsync
+        (
+            fileKey: request.FileKey,
+            cancellationToken: cancellationToken
+        );
         
-        await context.SaveChangesAsync(cancellationToken);
+        if (removeResult.IsFailure)
+            return Result.Failure<string>(removeResult.Error);
         
-        return Result.Success(completeMultiPartResult.Value);
+        return Result.Failure<string>(fileResult.Error);
     }
 }
