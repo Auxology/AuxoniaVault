@@ -4,7 +4,7 @@ using Main.SharedKernel;
 
 namespace Main.Infrastructure.Search.Services;
 
-public interface ISearchService
+public interface IOpenSearchService
 {
     Task<Result> InitializeIndexAsync(CancellationToken cancellationToken = default);
     
@@ -12,7 +12,7 @@ public interface ISearchService
     
     Task<Result> UpdateFileMetadataAsync(FileMetadata fileMetadata, CancellationToken cancellationToken = default);
     
-    Task<Result> DeleteFileMetadataAsync(Guid fileId, CancellationToken cancellationToken = default);
+    Task<Result> DeleteFileMetadataAsync(Guid fileMetadataId, CancellationToken cancellationToken = default);
 
     Task<Result> BulkIndexFileMetadataAsync(IEnumerable<FileMetadata> fileMetadataList,
         CancellationToken cancellationToken = default);
@@ -24,10 +24,11 @@ public interface ISearchService
         SearchFilters searchFilters,
         int page,
         int pageSize,
+        string sortBy,
         CancellationToken cancellationToken = default
     );
 
-    Task<IReadOnlyList<string>> AutocompleteAsync
+    Task<Result<IReadOnlyList<string>>> AutocompleteAsync
     (
         string searchTerm,
         Guid ownerId,

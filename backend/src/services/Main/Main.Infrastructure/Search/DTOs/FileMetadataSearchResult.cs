@@ -11,5 +11,6 @@ public class FileMetadataSearchResult
     DateTimeOffset CreatedAt,
     DateTimeOffset? ModifiedAt,
     string? Description,
-    bool IsStarred
+    bool IsStarred,
+    double Score
 );
