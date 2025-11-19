@@ -1,7 +1,6 @@
 using Main.Domain.Aggregates.FileMetadata;
 using Main.Domain.Constants;
 using Main.Domain.ValueObjects;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -64,27 +63,5 @@ internal sealed class FileMetadataConfiguration : IEntityTypeConfiguration<FileM
         b.Property(fm => fm.IsStarred)
             .HasColumnType("boolean")
             .IsRequired();
-        
-        b.Property(fm => fm.SearchVector)
-            .HasColumnType("tsvector")
-            .HasComputedColumnSql(
-                "to_tsvector('english', coalesce(\"FileName\", '') || ' ' || coalesce(\"Description\", ''))",
-                stored: true) 
-            .IsRequired(false);
-        
-        b.HasIndex(fm => fm.OwnerId)
-            .HasDatabaseName("IX_FileMetadata_OwnerId");
-
-        b.HasIndex(fm => new { fm.OwnerId, fm.CreatedAt })
-            .HasDatabaseName("IX_FileMetadata_OwnerId_CreatedAt");
-        
-        b.HasIndex(fm => new { fm.OwnerId, fm.IsStarred })
-            .HasDatabaseName("IX_FileMetadata_OwnerId_IsStarred");
-
-        b.HasIndex(fm => new { fm.OwnerId, fm.ContentType })
-            .HasDatabaseName("IX_FileMetadata_OwnerId_ContentType");
-
-        b.HasIndex(fm => fm.SearchVector)
-            .HasMethod("GIN");
     }
 }

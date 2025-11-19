@@ -39,4 +39,16 @@ internal static class FileMetadataErrors
         code: "Files.FileNameTooLong",
         description: "File name is too long."
     );
+    
+    public static Error UpdateDescriptionRequired => Error.Validation
+    (
+        code: "Files.UpdateDescriptionRequired",
+        description: "Description is required when updating it."
+    );
+    
+    public static Error DescriptionTooLong => Error.Validation
+    (
+        code: "Files.DescriptionTooLong",
+        description: "Description is too long."
+    );
 }

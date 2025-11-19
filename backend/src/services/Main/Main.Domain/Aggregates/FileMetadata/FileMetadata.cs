@@ -1,5 +1,6 @@
 using Main.Domain.Constants;
 using Main.Domain.Errors;
+using Main.Domain.Events;
 using Main.Domain.ValueObjects;
 using Main.SharedKernel;
 
@@ -26,9 +27,6 @@ public sealed class FileMetadata : Entity, IAggregateRoot
     public string? Description { get; private set; }
     
     public bool IsStarred { get; private set; }
-    
-    public string? SearchVector { get; private set; }
-    
     
     private FileMetadata() { }
 
@@ -77,7 +75,90 @@ public sealed class FileMetadata : Entity, IAggregateRoot
 
         FileMetadata fileMetadata =
             new FileMetadata(ownerId, fileName, contentType, fileSizeInBytes, fileKey, utcNow);
+
+        fileMetadata.Raise(new FileMetadataCreatedDomainEvent
+        (
+            FileId: fileMetadata.Id.Value,
+            OwnerId: fileMetadata.OwnerId.Value,
+            FileName: fileMetadata.FileName,
+            ContentType: fileMetadata.ContentType,
+            FileSizeInBytes: fileMetadata.FileSizeInBytes,
+            FileKey: fileMetadata.FileKey,
+            CreatedAt: fileMetadata.CreatedAt
+        ));
         
         return Result.Success(fileMetadata);
+    }
+
+    public Result UpdateDescription(string description, IDateTimeProvider dateTimeProvider)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+            return Result.Failure(FileMetadataErrors.UpdateDescriptionRequired);
+        
+        if (description.Length > FileConstants.MaxDescriptionLength)
+            return Result.Failure(FileMetadataErrors.DescriptionTooLong);
+        
+        Description = description;
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        ModifiedAt = utcNow;
+        
+        Raise(new FileMetadataUpdatedDomainEvent
+        (
+            FileId: Id.Value,
+            OwnerId: OwnerId.Value,
+            FileName: FileName,
+            FileDescription: Description,
+            IsStarred: IsStarred,
+            ModifiedAt: utcNow
+        ));
+        
+        return Result.Success();
+    }
+
+    public Result ToggleStar(IDateTimeProvider dateTimeProvider)
+    {
+        IsStarred = !IsStarred;
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        ModifiedAt = utcNow;
+        
+        Raise(new FileMetadataUpdatedDomainEvent
+        (
+            FileId: Id.Value,
+            OwnerId: OwnerId.Value,
+            FileName: FileName,
+            FileDescription: Description,
+            IsStarred: IsStarred,
+            ModifiedAt: utcNow
+        ));
+        
+        return Result.Success();
+    }
+    
+    public Result SetStarred(bool isStarred, IDateTimeProvider dateTimeProvider)
+    {
+        if (IsStarred == isStarred)
+            return Result.Success();
+        
+        IsStarred = isStarred;
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        
+        ModifiedAt = utcNow;
+        
+        Raise(new FileMetadataUpdatedDomainEvent
+        (
+            FileId: Id.Value,
+            OwnerId: OwnerId.Value,
+            FileName: FileName,
+            FileDescription: Description,
+            IsStarred: IsStarred,
+            ModifiedAt: utcNow
+        ));
+        
+        return Result.Success();
     }
 }

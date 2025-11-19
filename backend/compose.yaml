@@ -27,7 +27,7 @@ services:
     networks:
       - auxonia-network
         
-  open-search:
+  opensearch:
     image: opensearchproject/opensearch:3
     container_name: AuxoniaVault.OpenSearch
     environment:
@@ -35,7 +35,7 @@ services:
       - node.name=auxonia-vault-node
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
       - DISABLE_SECURITY_PLUGIN=true
       - DISABLE_INSTALL_DEMO_CONFIG=true
     ulimits:
