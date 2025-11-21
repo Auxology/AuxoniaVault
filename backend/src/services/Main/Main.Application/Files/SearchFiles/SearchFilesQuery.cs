@@ -13,5 +13,5 @@ public sealed record SearchFilesQuery
     long? MaxSizeInBytes,
     int Page,
     int PageSize,
-    string SortBy
+    string SortBy   
 ) : IQuery<SearchFilesResponse>;
