@@ -2,15 +2,23 @@ using System.Text;
 using Amazon.S3;
 using Main.Application.Abstractions.Authentication;
 using Main.Application.Abstractions.Database;
+using Main.Application.Abstractions.Messaging;
 using Main.Application.Abstractions.Storage;
+using Main.Domain.Events;
 using Main.Infrastructure.Authentication;
+using Main.Infrastructure.Consumers.Search;
 using Main.Infrastructure.Database;
 using Main.Infrastructure.DomainEvents;
+using Main.Infrastructure.Search;
+using Main.Infrastructure.Search.Services;
+using Main.Infrastructure.Search.Settings;
 using Main.Infrastructure.Storage;
 using Main.Infrastructure.Time;
 using Main.SharedKernel;
 using MassTransit;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +26,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using OpenSearch.Client;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -34,10 +43,12 @@ public static class DependencyInjection
             .AddOtel()
             .AddServices()
             .AddDatabase(configuration)
+            .AddRedisCache(configuration)
             .AddMassTransit(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
             .AddStorage(configuration)
+            .AddOpenSearch(configuration)
             .AddConsumers();
 
     private static IServiceCollection AddOtel(this IServiceCollection services)
@@ -196,16 +207,56 @@ public static class DependencyInjection
 
     private static IServiceCollection AddConsumers(this IServiceCollection services)
     {
+        services
+            .AddTransient<INotificationHandler<DomainEventNotification<FileMetadataCreatedDomainEvent>>,
+                FileMetadataCreatedEventHandler>();
+        
+        services
+            .AddTransient<INotificationHandler<DomainEventNotification<FileMetadataUpdatedDomainEvent>>,
+                FileMetadataUpdatedEventHandler>();
+        
         return services;
     }
     
     private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
     {
+        var redisConnection = configuration.GetConnectionString("Redis");
+        
+        if (string.IsNullOrWhiteSpace(redisConnection))
+            throw new InvalidOperationException("Connection string 'Redis' not found.");
+        
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("Redis");
+            options.Configuration = redisConnection;
             options.InstanceName = "AuxoniaVault";
         });
+        
+        return services;
+    }
+
+    private static IServiceCollection AddOpenSearch(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<OpenSearchSettings>(configuration.GetSection(OpenSearchSettings.SectionName));
+        
+        services.AddSingleton<IOpenSearchClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<OpenSearchSettings>>().Value;
+
+            if (string.IsNullOrWhiteSpace(settings.Uri))
+                throw new InvalidOperationException("OpenSearch URI is not configured.");
+
+            var connectionSettings = new ConnectionSettings(new Uri(settings.Uri))
+                .DefaultIndex(settings.DefaultIndex)
+                .DisableDirectStreaming()
+                .RequestTimeout(TimeSpan.FromSeconds(settings.RequestTimeout))
+                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true);
+
+            return new OpenSearchClient(connectionSettings);
+        });
+
+        services.AddScoped<IOpenSearchService, OpenSearchService>();
+
+        services.AddHostedService<OpenSearchIndexInitializer>();
         
         return services;
     }

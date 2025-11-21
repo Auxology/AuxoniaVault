@@ -7,5 +7,8 @@ public sealed record CompleteMultipartUploadCommand
 (
     string FileKey,
     string UploadId,
-    List<PartETag> Parts
+    List<PartETag> Parts,
+    string FileName,
+    long FileSizeInBytes,
+    string ContentType
 ) : ICommand<string>;

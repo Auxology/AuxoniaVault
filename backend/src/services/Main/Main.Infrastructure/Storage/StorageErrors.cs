@@ -15,4 +15,10 @@ internal static class StorageErrors
         "Storage.UnexpectedError",
         "An unexpected error occurred in the storage service."
     );
+    
+    public static Error DeletionFailed => Error.Failure
+    (
+        "Storage.DeletionFailed",
+        "An error occurred while deleting the file from storage."
+    );
 }

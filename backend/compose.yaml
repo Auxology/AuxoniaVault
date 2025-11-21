@@ -14,7 +14,7 @@ services:
       - "18888:18888"
     networks:
       - auxonia-network
-
+  
   rabbitmq:
     image: rabbitmq:4-management
     container_name: AuxoniaVault.RabbitMQ
@@ -24,6 +24,45 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-auxonia}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-auxonia}
+    networks:
+      - auxonia-network
+        
+  opensearch:
+    image: opensearchproject/opensearch:3
+    container_name: AuxoniaVault.OpenSearch
+    environment:
+      - cluster.name=auxonia-vault-cluster
+      - node.name=auxonia-vault-node
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - auxonia-network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
+    container_name: AuxoniaVault.OpenSearchDashboards
+    depends_on:
+      - opensearch
+    ports:
+      - "5601:5601"
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch:9200
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
     networks:
       - auxonia-network
 
@@ -76,6 +115,7 @@ services:
       - rabbitmq
       - redis
       - aspire-dashboard
+      - opensearch-dashboards
     build:
       context: .
       dockerfile: src/services/Auth/Auth.WebApi/Dockerfile
@@ -98,6 +138,8 @@ services:
       - S3Settings__BucketName=${S3_BUCKET_NAME:-auxoniabucket}
       - S3Settings__RegionName=${S3_REGION_NAME:-eu-central-1}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
+      - OpenSearch__Uri=${OPENSEARCH_URI:-http://opensearch:9200}
+      - OpenSearch__DefaultIndex=${OPENSEARCH_DEFAULT_INDEX:-file-metadata}
     networks:
       - auxonia-network
 
@@ -238,6 +280,8 @@ volumes:
   billingdb-data:
     driver: local
   maindb-data:
+    driver: local
+  opensearch-data: 
     driver: local
 
 networks:

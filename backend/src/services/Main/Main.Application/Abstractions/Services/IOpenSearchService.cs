@@ -1,0 +1,38 @@
+using Main.Application.Abstractions.DTOs;
+using Main.Domain.Aggregates.FileMetadata;
+using Main.SharedKernel;
+
+namespace Main.Infrastructure.Search.Services;
+
+public interface IOpenSearchService
+{
+    Task<Result> InitializeIndexAsync(CancellationToken cancellationToken = default);
+    
+    Task<Result> IndexFileMetadataAsync(FileMetadata fileMetadata, CancellationToken cancellationToken = default);
+    
+    Task<Result> UpdateFileMetadataAsync(FileMetadata fileMetadata, CancellationToken cancellationToken = default);
+    
+    Task<Result> DeleteFileMetadataAsync(Guid fileMetadataId, CancellationToken cancellationToken = default);
+
+    Task<Result> BulkIndexFileMetadataAsync(IEnumerable<FileMetadata> fileMetadataList,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<SearchResult<FileMetadataSearchResult>>> SearchFilesAsync
+    (
+        string searchTerm,
+        Guid ownerId,
+        SearchFilters searchFilters,
+        int page,
+        int pageSize,
+        string sortBy,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Result<IReadOnlyList<string>>> AutocompleteAsync
+    (
+        string searchTerm,
+        Guid ownerId,
+        int limit,
+        CancellationToken cancellationToken = default
+    );
+}

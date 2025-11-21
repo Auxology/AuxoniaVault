@@ -4,13 +4,20 @@ using Main.Application.Abstractions.Messaging;
 using Main.Application.Abstractions.Storage;
 using Main.Application.Errors;
 using Main.Domain.Aggregates.Account;
+using Main.Domain.Aggregates.FileMetadata;
 using Main.Domain.ValueObjects;
 using Main.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Files.CompleteMultipartUpload;
 
-internal sealed class CompleteMultiPartUploadCommandHandler(IMainDbContext context, IUserContext userContext, IStorageServices storageServices) : ICommandHandler<CompleteMultipartUploadCommand, string>
+internal sealed class CompleteMultiPartUploadCommandHandler
+(
+    IMainDbContext context,
+    IUserContext userContext,
+    IStorageServices storageServices,
+    IDateTimeProvider dateTimeProvider
+) : ICommandHandler<CompleteMultipartUploadCommand, string>
 {
     public async Task<Result<string>> Handle(CompleteMultipartUploadCommand request, CancellationToken cancellationToken)
     {
@@ -33,7 +40,35 @@ internal sealed class CompleteMultiPartUploadCommandHandler(IMainDbContext conte
         
         if (completeMultiPartResult.IsFailure)
             return Result.Failure<string>(completeMultiPartResult.Error);
+
+        Result<FileMetadata> fileResult = FileMetadata.Create
+        (
+            ownerId: userId,
+            fileName: request.FileName,
+            fileKey: request.FileKey,
+            fileSizeInBytes: request.FileSizeInBytes,
+            contentType: request.ContentType,
+            dateTimeProvider: dateTimeProvider
+        );
+
+        if (fileResult.IsSuccess)
+        {
+            await context.Files.AddAsync(fileResult.Value, cancellationToken);
         
-        return Result.Success(completeMultiPartResult.Value);
+            await context.SaveChangesAsync(cancellationToken);
+        
+            return Result.Success(completeMultiPartResult.Value);
+        }
+        
+        Result removeResult = await storageServices.RemoveFileAsync
+        (
+            fileKey: request.FileKey,
+            cancellationToken: cancellationToken
+        );
+        
+        if (removeResult.IsFailure)
+            return Result.Failure<string>(removeResult.Error);
+        
+        return Result.Failure<string>(fileResult.Error);
     }
 }
