@@ -11,7 +11,7 @@ internal sealed class ChangeName : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/auth/change-name", async
+        app.MapPatch("/api/auth/users/me/name", async
         (
             Request request,
             ISender sender,
@@ -22,7 +22,7 @@ internal sealed class ChangeName : IEndpoint
 
             Result<string> result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.NoContent() : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
         .WithTags(Tags.Users);

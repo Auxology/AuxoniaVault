@@ -12,7 +12,7 @@ internal sealed class EmailChangeVerifyNew : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/email/verify-new", async
+        app.MapPost("/api/auth/users/me/email/new/verification", async
             (
                 Request request,
                 ISender sender,

@@ -10,7 +10,7 @@ internal sealed class EmailChangeVerifyCurrent : IEndpoint
     private sealed record Request(int CurrentOtp);
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/email/verify-current", async (
+        app.MapPost("/api/auth/users/me/email/current/verification", async (
             Request request,
             HttpContext httpContext,
             ISender sender,

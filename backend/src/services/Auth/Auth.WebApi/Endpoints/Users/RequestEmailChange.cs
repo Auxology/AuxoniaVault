@@ -13,7 +13,7 @@ internal sealed class RequestEmailChange : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/email/request-change", async (
+        app.MapPost("/api/auth/users/me/email/change-requests", async (
             Request request,
             HttpContext httpContext,
             ISender sender
@@ -25,7 +25,7 @@ internal sealed class RequestEmailChange : IEndpoint
 
             var result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Accepted() : CustomResults.Problem(result, httpContext);
 
         })
         .RequireAuthorization()

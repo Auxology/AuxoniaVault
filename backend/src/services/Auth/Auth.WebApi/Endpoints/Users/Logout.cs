@@ -9,7 +9,7 @@ internal sealed class Logout : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("api/auth/logout", async (
+        app.MapDelete("/api/auth/sessions/current", async (
             HttpContext httpContext,
             ISender sender
         ) =>
@@ -17,7 +17,7 @@ internal sealed class Logout : IEndpoint
             var refreshToken = httpContext.Request.Cookies["refreshToken"];
 
             if (string.IsNullOrEmpty(refreshToken))
-                return Results.Ok();
+                return Results.NoContent();
 
             var command = new LogoutCommand(refreshToken);
 
@@ -28,7 +28,7 @@ internal sealed class Logout : IEndpoint
 
             httpContext.RemoveAuthenticationCookie();
 
-            return Results.Ok();
+            return Results.NoContent();
         })
         .RequireAuthorization()
         .WithTags(Tags.Users);

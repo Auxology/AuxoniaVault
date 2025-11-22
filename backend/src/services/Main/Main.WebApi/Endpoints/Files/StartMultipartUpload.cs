@@ -10,7 +10,7 @@ internal sealed class StartMultipartUpload : IEndpoint
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/files/start-multipart", async
+        app.MapPost("/api/files/uploads", async
         (
             Request request,
             HttpContext httpContext,
@@ -26,7 +26,7 @@ internal sealed class StartMultipartUpload : IEndpoint
             
             var result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Created($"/api/files/{result.Value.FileKey}", result.Value) : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
         .WithName("StartMultipartUpload")

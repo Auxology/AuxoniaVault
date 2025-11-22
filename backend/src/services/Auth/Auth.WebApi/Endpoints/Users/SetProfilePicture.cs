@@ -12,7 +12,7 @@ internal sealed class SetProfilePicture : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/users/profile-picture/set", async
+        app.MapPut("/api/auth/users/me/profile-picture", async
             (
                 [FromForm] Request request,
                 ISender sender,
@@ -23,7 +23,7 @@ internal sealed class SetProfilePicture : IEndpoint
 
                 var result = await sender.Send(command);
 
-                return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, context);
+                return result.IsSuccess ? Results.NoContent() : CustomResults.Problem(result, context);
             })
             .RequireAuthorization()
             .WithTags(Tags.Users)

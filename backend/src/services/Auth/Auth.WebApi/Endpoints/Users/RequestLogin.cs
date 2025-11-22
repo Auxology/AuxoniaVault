@@ -11,7 +11,7 @@ internal sealed class RequestLogin() : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/request-login", async (
+        app.MapPost("/api/auth/sessions/login-requests", async (
             Request request,
             HttpContext httpContext,
             ISender sender
@@ -23,7 +23,7 @@ internal sealed class RequestLogin() : IEndpoint
 
             var result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Accepted() : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users);
     }

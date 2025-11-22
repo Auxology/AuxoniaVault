@@ -10,7 +10,7 @@ internal sealed class RevokeSessions : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("api/auth/users/revoke-sessions", async
+        app.MapDelete("/api/auth/users/me/sessions", async
         (
             HttpContext httpContext,
             [FromServices] ISender sender
@@ -25,7 +25,7 @@ internal sealed class RevokeSessions : IEndpoint
 
             var result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.NoContent() : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
         .WithTags(Tags.Users);

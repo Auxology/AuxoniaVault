@@ -8,7 +8,7 @@ internal sealed class DeleteFile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("api/files/{fileId:guid}", async
+        app.MapDelete("/api/files/{fileId:guid}", async
         (
             Guid fileId,
             HttpContext context,
