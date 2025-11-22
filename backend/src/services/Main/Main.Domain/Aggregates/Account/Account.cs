@@ -101,4 +101,34 @@ public sealed class Account : Entity, IAggregateRoot
         
         return Result.Success(true);
     }
+
+    public Result ChangeName
+    (
+        string newName,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            return Result.Failure(AccountErrors.AccountNameRequired);
+        
+        AccountName = newName;
+        UpdatedAt = dateTimeProvider.UtcNow;
+        
+        return Result.Success();
+    }
+    
+    public Result ChangeEmail
+    (
+        string newEmail,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        if (string.IsNullOrWhiteSpace(newEmail))
+            return Result.Failure(AccountErrors.AccountEmailRequired);
+        
+        AccountEmail = newEmail;
+        UpdatedAt = dateTimeProvider.UtcNow;
+        
+        return Result.Success();
+    }
 }

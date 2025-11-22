@@ -10,7 +10,7 @@ public sealed class FailedCleanup : Entity, IAggregateRoot
     
     public FileMetadataId FileId { get; private set; }
     
-    public UserId UserId { get; private set; }
+    public UserId OwnerId { get; private set; }
     
     public string FileKey { get; private set; }
     
@@ -21,24 +21,24 @@ public sealed class FailedCleanup : Entity, IAggregateRoot
     private FailedCleanup
     (
         FileMetadataId fileId,
-        UserId userId,
+        UserId ownerId,
         string fileKey,
         DateTimeOffset utcNow
     )
     {
         FileId = fileId;
-        UserId = userId;
+        OwnerId = ownerId;
         FileKey = fileKey;
         FailedAt = utcNow;
     }
 
-    public static FailedCleanup Create(FileMetadataId fileId, UserId userId, string fileKey,
+    public static FailedCleanup Create(FileMetadataId fileId, UserId ownerId, string fileKey,
         IDateTimeProvider dateTimeProvider)
     {
         FailedCleanup failedCleanup = new
         (
             fileId,
-            userId,
+            ownerId,
             fileKey,
             dateTimeProvider.UtcNow
         );
