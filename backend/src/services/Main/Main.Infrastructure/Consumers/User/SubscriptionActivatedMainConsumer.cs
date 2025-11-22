@@ -1,5 +1,4 @@
 using Main.Application.Abstractions.Database;
-using Main.Domain.Aggregates.Account;
 using Main.Domain.ValueObjects;
 using Main.SharedKernel;
 using MassTransit;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Contracts;
 
-namespace Main.Infrastructure.Consumers;
+namespace Main.Infrastructure.Consumers.User;
 
 public sealed class SubscriptionActivatedMainConsumer(
     IMainDbContext dbContext,
@@ -23,7 +22,7 @@ public sealed class SubscriptionActivatedMainConsumer(
         
         UserId typedUserId = UserId.UnsafeFromGuid(message.UserId);
         
-        Account? existingAccount = await dbContext.Accounts
+        Domain.Aggregates.Account.Account? existingAccount = await dbContext.Accounts
             .FirstOrDefaultAsync(a => a.Id == typedUserId, context.CancellationToken);
 
         if (existingAccount is null)

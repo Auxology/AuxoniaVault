@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Contracts;
 
-namespace Main.Infrastructure.Consumers;
+namespace Main.Infrastructure.Consumers.User;
 
 public sealed class CustomerTierInitializedMainConsumer
 (

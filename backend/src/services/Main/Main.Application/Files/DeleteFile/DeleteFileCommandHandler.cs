@@ -50,7 +50,7 @@ internal sealed class DeleteFileCommandHandler(
         var failedCleanup = FailedCleanup.Create
         (
             fileId: file.Id,
-            userId: account.Id,
+            ownerId: account.Id,
             fileKey: file.FileKey,
             dateTimeProvider: dateTimeProvider
         );

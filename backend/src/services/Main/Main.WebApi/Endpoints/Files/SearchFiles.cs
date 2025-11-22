@@ -9,7 +9,7 @@ internal sealed class SearchFiles : IEndpoint
 {
     private sealed record Request(
         string? SearchTerm,
-        List<string>? ContentTypes,
+        string[]? ContentTypes,
         bool? IsStarred,
         DateTimeOffset? CreatedAfter,
         DateTimeOffset? CreatedBefore,
@@ -27,7 +27,7 @@ internal sealed class SearchFiles : IEndpoint
                 HttpContext httpContext,
                 ISender sender,
                 string? searchTerm,
-                List<string>? contentTypes,
+                string[]? contentTypes,
                 bool? isStarred,
                 DateTimeOffset? createdAfter,
                 DateTimeOffset? createdBefore,
@@ -41,7 +41,7 @@ internal sealed class SearchFiles : IEndpoint
                 var command = new SearchFilesQuery
                 (
                     SearchTerm: searchTerm,
-                    ContentTypes: contentTypes,
+                    ContentTypes: contentTypes?.ToList(),
                     IsStarred: isStarred,
                     CreatedAfter: createdAfter,
                     CreatedBefore: createdBefore,

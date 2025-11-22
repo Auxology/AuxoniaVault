@@ -141,6 +141,7 @@ public static class DependencyInjection
             .AddJwtBearer(o =>
             {
                 o.RequireHttpsMetadata = false;
+                o.MapInboundClaims = false;
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
