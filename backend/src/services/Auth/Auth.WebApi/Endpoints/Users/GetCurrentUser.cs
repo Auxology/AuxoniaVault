@@ -8,7 +8,7 @@ internal sealed class GetCurrentUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/auth/me", async
+        app.MapGet("/api/auth/users/me", async
         (
             HttpContext httpContext,
             ISender sender

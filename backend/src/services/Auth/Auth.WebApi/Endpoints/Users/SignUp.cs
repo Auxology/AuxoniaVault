@@ -12,7 +12,7 @@ internal sealed class SignUp : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/sign-up", async
+        app.MapPost("/api/auth/users", async
         (
             Request request,
             HttpContext httpContext,
@@ -25,7 +25,7 @@ internal sealed class SignUp : IEndpoint
 
             Result<SignUpCommandResponse> result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Created($"/api/auth/users/{result.Value.UserId}", result.Value) : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users)
         .AllowAnonymous();

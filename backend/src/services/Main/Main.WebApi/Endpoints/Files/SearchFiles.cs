@@ -22,25 +22,34 @@ internal sealed class SearchFiles : IEndpoint
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/files/search", async
+        app.MapGet("/api/files", async
             (
                 HttpContext httpContext,
                 ISender sender,
-                Request request
+                string? searchTerm,
+                List<string>? contentTypes,
+                bool? isStarred,
+                DateTimeOffset? createdAfter,
+                DateTimeOffset? createdBefore,
+                long? minSizeInBytes,
+                long? maxSizeInBytes,
+                int page = 1,
+                int pageSize = 20,
+                string sortBy = "createdAt"
             ) =>
             {
                 var command = new SearchFilesQuery
                 (
-                    SearchTerm: request.SearchTerm,
-                    ContentTypes: request.ContentTypes,
-                    IsStarred: request.IsStarred,
-                    CreatedAfter: request.CreatedAfter,
-                    CreatedBefore: request.CreatedBefore,
-                    MinSizeInBytes: request.MinSizeInBytes,
-                    MaxSizeInBytes: request.MaxSizeInBytes,
-                    Page: request.Page,
-                    PageSize: request.PageSize,
-                    SortBy: request.SortBy
+                    SearchTerm: searchTerm,
+                    ContentTypes: contentTypes,
+                    IsStarred: isStarred,
+                    CreatedAfter: createdAfter,
+                    CreatedBefore: createdBefore,
+                    MinSizeInBytes: minSizeInBytes,
+                    MaxSizeInBytes: maxSizeInBytes,
+                    Page: page,
+                    PageSize: pageSize,
+                    SortBy: sortBy
                 );
 
                 Result<SearchFilesResponse> result = await sender.Send(command);

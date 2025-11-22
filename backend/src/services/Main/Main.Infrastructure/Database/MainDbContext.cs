@@ -1,5 +1,6 @@
 using Main.Application.Abstractions.Database;
 using Main.Domain.Aggregates.Account;
+using Main.Domain.Aggregates.FailedCleanup;
 using Main.Domain.Aggregates.FileMetadata;
 using Main.Infrastructure.DomainEvents;
 using Main.SharedKernel;
@@ -21,6 +22,8 @@ public sealed class MainDbContext(DbContextOptions<MainDbContext> options, IDoma
     public DbSet<Account> Accounts { get; set; }
     
     public DbSet<FileMetadata> Files { get; set; }
+    
+    public DbSet<FailedCleanup> FailedCleanups { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

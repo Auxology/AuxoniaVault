@@ -10,7 +10,7 @@ internal sealed class PresignedPartUpload : IEndpoint
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/files/{key}/presigned-part", async
+        app.MapPost("/api/files/{key}/uploads/parts/presigned-urls", async
             (
                 string key,
                 Request request,

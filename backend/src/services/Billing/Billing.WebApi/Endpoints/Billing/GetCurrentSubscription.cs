@@ -9,7 +9,7 @@ internal sealed class CheckSubscriptionStatus : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/billing/subscription/status", async
+        app.MapGet("/api/billing/subscriptions/current", async
         (
             HttpContext httpContext,
             ISender sender

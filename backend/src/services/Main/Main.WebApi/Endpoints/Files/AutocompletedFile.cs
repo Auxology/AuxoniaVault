@@ -9,7 +9,7 @@ internal sealed class AutocompleteFiles : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/files/autocomplete", async
+        app.MapGet("/api/files/autocomplete", async
         (
             [FromQuery] string q,
             [FromQuery] int limit,

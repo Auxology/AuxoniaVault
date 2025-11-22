@@ -11,7 +11,7 @@ internal sealed class RequestRecovery : IEndpoint
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/request-recovery", async
+        app.MapPost("/api/auth/recovery", async
         (
             Request request,
             ISender sender,
@@ -22,7 +22,7 @@ internal sealed class RequestRecovery : IEndpoint
 
             Result<string> result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Accepted(value: result.Value) : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users);
         }

@@ -11,7 +11,7 @@ internal sealed class CompleteRecovery : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/complete-recovery", async
+        app.MapPost("/api/auth/recovery/complete", async
         (
             Request request,
             ISender sender,
@@ -22,7 +22,7 @@ internal sealed class CompleteRecovery : IEndpoint
             
             var result = await sender.Send(command);
             
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.NoContent() : CustomResults.Problem(result, httpContext);
         })
         .WithTags(Tags.Users);
     }
