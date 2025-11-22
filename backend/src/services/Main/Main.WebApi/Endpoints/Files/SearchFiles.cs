@@ -27,7 +27,7 @@ internal sealed class SearchFiles : IEndpoint
                 HttpContext httpContext,
                 ISender sender,
                 string? searchTerm,
-                [FromQuery] List<string>? contentTypes,
+                List<string>? contentTypes,
                 bool? isStarred,
                 DateTimeOffset? createdAfter,
                 DateTimeOffset? createdBefore,

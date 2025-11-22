@@ -9,7 +9,7 @@ internal sealed class CancelSubscription : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch("api/billing/subscriptions/{subscriptionId}/cancel", async
+        app.MapDelete("/api/billing/subscriptions/{subscriptionId}", async
         (
             string subscriptionId,
             HttpContext httpContext,
@@ -20,7 +20,7 @@ internal sealed class CancelSubscription : IEndpoint
 
             Result result = await sender.Send(command);
 
-            return result.IsSuccess ? Results.Ok() : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.NoContent() : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
         .WithName("CancelSubscription")

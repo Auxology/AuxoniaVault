@@ -9,7 +9,7 @@ internal sealed class GetUserSubscriptionHistories : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/billing/subscription-histories", async
+        app.MapGet("/api/billing/subscriptions/histories", async
         (
             HttpContext httpContext,
             ISender sender

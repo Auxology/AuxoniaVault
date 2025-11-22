@@ -9,7 +9,7 @@ internal sealed class CreatePortalSession : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/billing/portal-sessions", async 
+        app.MapPost("/api/billing/portal-sessions", async 
         (
             HttpContext httpContext, 
             ISender sender
@@ -20,7 +20,7 @@ internal sealed class CreatePortalSession : IEndpoint
 
             Result<string> result = await sender.Send(command);
             
-            return result.IsSuccess ? Results.Ok(result.Value) : CustomResults.Problem(result, httpContext);
+            return result.IsSuccess ? Results.Created("/api/billing/portal-sessions", result.Value) : CustomResults.Problem(result, httpContext);
         })
         .RequireAuthorization()
         .WithName("CreatePortalSession")

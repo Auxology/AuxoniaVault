@@ -8,7 +8,7 @@ internal sealed class StripeWebhook : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/billing/webhooks/stripe", async
+        app.MapPost("/api/billing/webhooks/stripe", async
         (
             HttpContext httpContext,
             IStripeWebhookHandler handler,
