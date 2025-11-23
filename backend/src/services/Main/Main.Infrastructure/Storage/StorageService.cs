@@ -165,4 +165,42 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
             return Result.Failure(StorageErrors.UnexpectedError);
         }
     }
+
+    public async Task<Result<string>> GetDownloadUrlAsync(string fileKey, CancellationToken cancellationToken)
+    {
+        var formatedKey = $"{UserFiles}/{fileKey}";
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow.AddMinutes(ExpiresInMinutes);
+
+        try
+        {
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = options.Value.BucketName,
+                Key = formatedKey,
+                Verb = HttpVerb.GET,
+                Expires = dateTimeProvider.ToDateTime(utcNow)
+            };
+            
+            string? preSignedUrl = await amazonS3.GetPreSignedURLAsync(request);
+            
+            if (string.IsNullOrEmpty(preSignedUrl))
+            {
+                logger.LogError("Failed to generate download URL for fileKey {FileKey}", fileKey);
+                return Result.Failure<string>(StorageErrors.DownloadFailed);
+            }
+            
+            return Result.Success(preSignedUrl);
+        }
+        catch (AmazonS3Exception s3Exception)
+        {
+            logger.LogError(s3Exception, "S3 error generating download URL for fileKey {FileKey}", fileKey);
+            return Result.Failure<string>(StorageErrors.DownloadFailed);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected error generating download URL for fileKey {FileKey}", fileKey);
+            return Result.Failure<string>(StorageErrors.UnexpectedError);
+        }
+    }
 }
