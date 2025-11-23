@@ -19,6 +19,10 @@ public class UserRecoveryRequest : Entity
     
     public bool IsCompleted { get; private set; }
     
+    public string IpAddress { get; private set; }
+    
+    public string UserAgent { get; private set; }
+    
     public string? NewEmail { get; private set; } 
     
     public DateTimeOffset? CompletedAt { get; private set; }
@@ -29,6 +33,8 @@ public class UserRecoveryRequest : Entity
     (
         string uniqueIdentifier,
         UserId userId,
+        string ipAddress,
+        string userAgent,
         DateTimeOffset utcNow
     )
     {
@@ -37,12 +43,16 @@ public class UserRecoveryRequest : Entity
         ApprovedAt = utcNow;
         ExpiresAt = utcNow.AddMinutes(UserRecoveryRequestConstants.ExpiresInMinutes);
         IsCompleted = false;
+        IpAddress = ipAddress;
+        UserAgent = userAgent;
     }
 
     public static Result<UserRecoveryRequest> Create
     (
         string uniqueIdentifier,
         UserId userId,
+        string ipAddress,
+        string userAgent,
         IDateTimeProvider dateTimeProvider
     )
     {
@@ -52,11 +62,19 @@ public class UserRecoveryRequest : Entity
         if (string.IsNullOrWhiteSpace(uniqueIdentifier))
             return Result.Failure<UserRecoveryRequest>(UserRecoveryRequestErrors.UniqueIdentifierRequired);
         
-        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+        if (string.IsNullOrWhiteSpace(ipAddress))
+            return Result.Failure<UserRecoveryRequest>(UserRecoveryRequestErrors.IpAddressRequired);
         
+        if (string.IsNullOrWhiteSpace(userAgent))
+            return Result.Failure<UserRecoveryRequest>(UserRecoveryRequestErrors.UserAgentRequired);
+        
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow;
+
         var request = new UserRecoveryRequest(
             uniqueIdentifier,
             userId,
+            ipAddress,
+            userAgent,
             utcNow
         );
         
