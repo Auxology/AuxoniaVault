@@ -866,4 +866,222 @@ public sealed class EmailTemplateService(IOptions<EmailSettings> emailSettings)
 </body>
 </html>";
     }
+
+    public string CreateUserRecoveredTemplate(Guid userId, string newEmail, string ipAddress, string userAgent, DateTimeOffset recoveredAt)
+    {
+        return $@"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Account Successfully Recovered - {_settings.CompanyName}</title>
+    <style>
+        body {{
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: oklch(0.3211 0 0);
+            background-color: oklch(0.9846 0.0017 247.8389);
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }}
+        .header {{
+            background: oklch(0.5461 0.2152 262.8809);
+            color: oklch(1.0000 0 0);
+            padding: 32px 24px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }}
+        .content {{
+            padding: 32px 24px;
+        }}
+        .success-container {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 2px solid oklch(0.5461 0.2152 262.8809);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+        }}
+        .success-icon {{
+            font-size: 48px;
+            margin-bottom: 16px;
+        }}
+        .info-box {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-left: 4px solid oklch(0.6231 0.1880 259.8145);
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }}
+        .info-box p {{
+            margin: 0;
+            color: oklch(0.3791 0.1378 265.5222);
+        }}
+        .recovery-details {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 1px solid oklch(0.9276 0.0058 264.5313);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .recovery-details h3 {{
+            color: oklch(0.3211 0 0);
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }}
+        .recovery-details p {{
+            color: oklch(0.5510 0.0234 264.3637);
+            margin: 4px 0;
+            font-size: 14px;
+        }}
+        .footer {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            padding: 24px;
+            text-align: center;
+            color: oklch(0.5510 0.0234 264.3637);
+            font-size: 14px;
+        }}
+        .footer a {{
+            color: oklch(0.6231 0.1880 259.8145);
+            text-decoration: none;
+        }}
+        .security-info {{
+            background-color: oklch(0.9514 0.0250 236.8242);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .security-info h3 {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .security-info p {{
+            color: oklch(0.3791 0.1378 265.5222);
+            margin: 0;
+            font-size: 14px;
+        }}
+        .warning-notice {{
+            background-color: oklch(0.6368 0.2078 25.3313);
+            color: oklch(1.0000 0 0);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .warning-notice h3 {{
+            color: oklch(1.0000 0 0);
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .warning-notice p {{
+            color: oklch(1.0000 0 0);
+            margin: 0;
+            font-size: 14px;
+        }}
+        .next-steps {{
+            background-color: oklch(0.9846 0.0017 247.8389);
+            border: 1px solid oklch(0.9276 0.0058 264.5313);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 24px 0;
+        }}
+        .next-steps h3 {{
+            color: oklch(0.3211 0 0);
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }}
+        .next-steps p {{
+            color: oklch(0.5510 0.0234 264.3637);
+            margin: 4px 0;
+            font-size: 14px;
+        }}
+        .next-steps ul {{
+            margin: 8px 0;
+            padding-left: 20px;
+        }}
+        .next-steps li {{
+            color: oklch(0.5510 0.0234 264.3637);
+            margin: 4px 0;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>✅ Account Successfully Recovered</h1>
+        </div>
+        
+        <div class=""content"">
+            <h2>Your Account Has Been Recovered</h2>
+            <p>Great news! Your {_settings.CompanyName} account has been successfully recovered. You can now access your account using your new email address.</p>
+            
+            <div class=""success-container"">
+                <div class=""success-icon"">🎉</div>
+                <h3>Account Recovery Complete</h3>
+                <p>Your account access has been fully restored.</p>
+            </div>
+            
+            <div class=""info-box"">
+                <p><strong>🆔 User ID:</strong> {userId}</p>
+                <p><strong>📧 New Email:</strong> {newEmail}</p>
+                <p><strong>🕐 Recovered At:</strong> {recoveredAt:yyyy-MM-dd HH:mm:ss UTC}</p>
+            </div>
+            
+            <div class=""recovery-details"">
+                <h3>🔍 Recovery Details</h3>
+                <p><strong>User ID:</strong> {userId}</p>
+                <p><strong>New Email:</strong> {newEmail}</p>
+                <p><strong>IP Address:</strong> {ipAddress}</p>
+                <p><strong>User Agent:</strong> {userAgent}</p>
+                <p><strong>Timestamp:</strong> {recoveredAt:yyyy-MM-dd HH:mm:ss UTC}</p>
+            </div>
+            
+            <div class=""next-steps"">
+                <h3>📋 Next Steps</h3>
+                <p>Now that your account has been recovered:</p>
+                <ul>
+                    <li>Use your new email address ({newEmail}) to log in</li>
+                    <li>Review your account settings and security preferences</li>
+                    <li>Consider updating your password for additional security</li>
+                    <li>Check your recent account activity</li>
+                </ul>
+            </div>
+            
+            <div class=""security-info"">
+                <h3>🔐 Security Information</h3>
+                <p>Your account has been secured and all your data remains intact. We recommend reviewing your account security settings and enabling additional security measures if available.</p>
+            </div>
+            
+            <div class=""warning-notice"">
+                <h3>⚠️ Important Security Notice</h3>
+                <p>If you did not initiate this account recovery, please contact our support team immediately. Your account security may be compromised.</p>
+            </div>
+            
+            <p>Welcome back! If you need any assistance or have questions about your recovered account, our support team is here to help.</p>
+        </div>
+        
+        <div class=""footer"">
+            <p>This email was sent to {newEmail}</p>
+            <p>© {DateTime.UtcNow.Year} {_settings.CompanyName}. All rights reserved.</p>
+            {(!string.IsNullOrEmpty(_settings.SupportEmail) ? $"<p>Need help? Contact us at <a href=\"mailto:{_settings.SupportEmail}\">{_settings.SupportEmail}</a></p>" : "")}
+            {(!string.IsNullOrEmpty(_settings.WebsiteUrl) ? $"<p>Visit our website: <a href=\"{_settings.WebsiteUrl}\">{_settings.WebsiteUrl}</a></p>" : "")}
+        </div>
+    </div>
+</body>
+</html>";
+    }
 }

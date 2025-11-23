@@ -1,6 +1,6 @@
 namespace Shared.Contracts;
 
-public sealed class UserRecoveredContract
+public sealed record UserRecoveredContract
 (
     Guid UserId,
     string NewEmail,
