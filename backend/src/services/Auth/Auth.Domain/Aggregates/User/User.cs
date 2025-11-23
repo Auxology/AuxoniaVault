@@ -228,6 +228,15 @@ public class User : Entity, IAggregateRoot
         
         UpdatedAt = dateTimeProvider.UtcNow;
 
+        Raise(new UserRecoveredDomainEvent
+        (
+            UserId: Id.Value,
+            NewEmail: newEmail.Value,
+            IpAddress: recoveryRequest.IpAddress,
+            UserAgent: recoveryRequest.UserAgent,
+            RecoveredAt: dateTimeProvider.UtcNow
+        ));
+
         return Result.Success();
     }
 }

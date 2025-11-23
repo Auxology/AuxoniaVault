@@ -13,7 +13,7 @@ internal sealed class EmailChangedDomainEventHandler(IPublishEndpoint publishEnd
     {
         var domainEvent = notification.Event;
 
-        var contract = new EmailChangedContract
+        EmailChangedContract contract = new
         (
             domainEvent.UserId,
             domainEvent.NewEmail,
