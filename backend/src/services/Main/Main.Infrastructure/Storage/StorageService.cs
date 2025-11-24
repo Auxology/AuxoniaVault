@@ -203,4 +203,38 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
             return Result.Failure<string>(StorageErrors.UnexpectedError);
         }
     }
+
+    public async Task<Result<Stream>> GetFileStreamAsync(string fileKey, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var formatedKey = $"{UserFiles}/{fileKey}";
+
+            var request = new GetObjectRequest
+            {
+                BucketName = options.Value.BucketName,
+                Key = formatedKey
+            };
+            
+            GetObjectResponse response = await amazonS3.GetObjectAsync(request, cancellationToken);
+
+            if (response.ResponseStream is null)
+            {
+                logger.LogError("Failed to get file stream for fileKey {FileKey}", fileKey);
+                return Result.Failure<Stream>(StorageErrors.FailedToGetStream);
+            }
+            
+            return Result.Success(response.ResponseStream);
+        }
+        catch (AmazonS3Exception s3Exception)
+        {
+            logger.LogError(s3Exception, "S3 error generating download URL for fileKey {FileKey}", fileKey);
+            return Result.Failure<Stream>(StorageErrors.FailedToGetStream);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected error generating download URL for fileKey {FileKey}", fileKey);
+            return Result.Failure<Stream>(StorageErrors.UnexpectedError);
+        }
+    }
 }

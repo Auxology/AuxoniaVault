@@ -27,4 +27,10 @@ internal static class StorageErrors
         "Storage.DownloadFailed",
         "An error occurred while downloading the file from storage."
     );
+    
+    public static Error FailedToGetStream => Error.Failure
+    (
+        "Storage.FailedToGetStream",
+        "Failed to get the file stream from storage."
+    );
 }

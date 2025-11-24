@@ -14,4 +14,6 @@ public interface IStorageServices
     Task<Result> RemoveFileAsync(string fileKey, CancellationToken cancellationToken);
     
     Task<Result<string>> GetDownloadUrlAsync(string fileKey, CancellationToken cancellationToken);
+    
+    Task<Result<Stream>> GetFileStreamAsync(string fileKey, CancellationToken cancellationToken);
 }
