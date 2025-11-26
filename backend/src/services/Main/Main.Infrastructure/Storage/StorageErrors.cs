@@ -21,4 +21,16 @@ internal static class StorageErrors
         "Storage.DeletionFailed",
         "An error occurred while deleting the file from storage."
     );
+    
+    public static Error DownloadFailed => Error.Failure
+    (
+        "Storage.DownloadFailed",
+        "An error occurred while downloading the file from storage."
+    );
+    
+    public static Error FailedToGetStream => Error.Failure
+    (
+        "Storage.FailedToGetStream",
+        "Failed to get the file stream from storage."
+    );
 }

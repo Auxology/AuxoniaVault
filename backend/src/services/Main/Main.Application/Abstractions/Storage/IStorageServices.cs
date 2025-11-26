@@ -12,4 +12,10 @@ public interface IStorageServices
     Task<Result<string>> CompleteMultiPartUploadAsync(string userId, string fileKey, string uploadId, List<PartETag> partETags, CancellationToken cancellationToken);
     
     Task<Result> RemoveFileAsync(string fileKey, CancellationToken cancellationToken);
+    
+    Task<Result<string>> GetDownloadUrlAsync(string fileKey, CancellationToken cancellationToken);
+    
+    Task<Result<Dictionary<string, string>>> GetDownloadUrlsAsync(IEnumerable<string> fileKeys, CancellationToken cancellationToken);
+
+    Task<Result<Stream>> GetFileStreamAsync(string fileKey, CancellationToken cancellationToken);
 }
