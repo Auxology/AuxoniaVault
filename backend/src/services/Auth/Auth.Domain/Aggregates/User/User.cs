@@ -186,7 +186,8 @@ public class User : Entity, IAggregateRoot
         return Result.Success();
     }
 
-    public Result<UserRecoveryRequest> ApproveRecoveryRequest(string uniqueIdentifier, IDateTimeProvider dateTimeProvider)
+    public Result<UserRecoveryRequest> ApproveRecoveryRequest(string uniqueIdentifier, string ipAddress,
+        string userAgent, IDateTimeProvider dateTimeProvider)
     {
         IEnumerable<UserRecoveryRequest> recoveryRequests = RecoveryRequests.ToList();
 
@@ -199,6 +200,8 @@ public class User : Entity, IAggregateRoot
         (
             uniqueIdentifier,
             Id,
+            ipAddress,
+            userAgent,
             dateTimeProvider
         );
 
@@ -224,6 +227,15 @@ public class User : Entity, IAggregateRoot
             return Result.Failure(completeResult.Error);
         
         UpdatedAt = dateTimeProvider.UtcNow;
+
+        Raise(new UserRecoveredDomainEvent
+        (
+            UserId: Id.Value,
+            NewEmail: newEmail.Value,
+            IpAddress: recoveryRequest.IpAddress,
+            UserAgent: recoveryRequest.UserAgent,
+            RecoveredAt: dateTimeProvider.UtcNow
+        ));
 
         return Result.Success();
     }

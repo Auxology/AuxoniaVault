@@ -43,6 +43,16 @@ internal sealed class UserRecoveryRequestConfiguration : IEntityTypeConfiguratio
             .HasColumnType("boolean")
             .IsRequired();
         
+        b.Property(urq => urq.IpAddress)
+            .HasMaxLength(RequestMetadataConstants.MaxIpAddressLength)
+            .HasColumnType("text")
+            .IsRequired();
+        
+        b.Property(urq => urq.UserAgent)
+            .HasMaxLength(RequestMetadataConstants.MaxUserAgentLength)
+            .HasColumnType("text")
+            .IsRequired();
+        
         b.Property(urq => urq.NewEmail)
             .HasMaxLength(UserConstants.MaxEmailLength)
             .HasColumnType("citext")

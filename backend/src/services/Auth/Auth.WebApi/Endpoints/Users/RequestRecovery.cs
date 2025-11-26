@@ -1,5 +1,6 @@
 using Auth.Application.Users.RequestRecovery;
 using Auth.SharedKernel;
+using Auth.WebApi.Extensions;
 using Auth.WebApi.Infrastructure;
 using MediatR;
 
@@ -18,7 +19,9 @@ internal sealed class RequestRecovery : IEndpoint
             HttpContext httpContext
         ) =>
         {
-            var command = new RequestRecoveryCommand(request.UserId, request.RecoveryCode);
+            var requestMetadata = httpContext.GetRequestMetadata();
+
+            var command = new RequestRecoveryCommand(request.UserId, request.RecoveryCode, requestMetadata);
 
             Result<string> result = await sender.Send(command);
 

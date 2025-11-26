@@ -33,8 +33,14 @@ internal sealed class RequestRecoveryCommandHandler(IAuthDbContext context, ISec
             return Result.Failure<string>(UserErrors.InvalidRecoveryCode);
         
         string uniqueIdentifier = await generator.GenerateUniqueIdentifier();
-        
-        var requestResult = user.ApproveRecoveryRequest(uniqueIdentifier, dateTimeProvider);
+
+        var requestResult = user.ApproveRecoveryRequest
+        (
+            uniqueIdentifier: uniqueIdentifier,
+            ipAddress: request.RequestMetadata.IpAddress,
+            userAgent: request.RequestMetadata.UserAgent,
+            dateTimeProvider: dateTimeProvider
+        );
         
         if (requestResult.IsFailure)
             return Result.Failure<string>(requestResult.Error);

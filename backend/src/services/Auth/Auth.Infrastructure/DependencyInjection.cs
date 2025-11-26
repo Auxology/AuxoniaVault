@@ -14,6 +14,7 @@ using Auth.Infrastructure.IntegrationEvents.EmailChangeRequested;
 using Auth.Infrastructure.IntegrationEvents.LoginRequested;
 using Auth.Infrastructure.IntegrationEvents.NameChanged;
 using Auth.Infrastructure.IntegrationEvents.SignUp;
+using Auth.Infrastructure.IntegrationEvents.UserRecovered;
 using Auth.Infrastructure.Jobs;
 using Auth.Infrastructure.Services;
 using Auth.Infrastructure.Storage;
@@ -233,6 +234,9 @@ public static class DependencyInjection
         
         services.AddTransient<INotificationHandler<DomainEventNotification<UserNameChangeDomainEvent>>,
             UserNameChangedDomainEventHandler>();
+
+        services.AddTransient<INotificationHandler<DomainEventNotification<UserRecoveredDomainEvent>>,
+            UserRecoveredDomainEventHandler>();
         
         return services;
     }
