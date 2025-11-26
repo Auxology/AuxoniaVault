@@ -2,6 +2,7 @@ using Main.Application.Files.DownloadMultipleFiles;
 using Main.SharedKernel;
 using Main.WebApi.Infrastructure;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Main.WebApi.Endpoints.Files;
 

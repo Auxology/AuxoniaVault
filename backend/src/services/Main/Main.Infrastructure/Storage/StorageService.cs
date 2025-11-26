@@ -169,7 +169,7 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
     public async Task<Result<string>> GetDownloadUrlAsync(string fileKey, CancellationToken cancellationToken)
     {
         var formatedKey = $"{UserFiles}/{fileKey}";
-        
+
         DateTimeOffset utcNow = dateTimeProvider.UtcNow.AddMinutes(ExpiresInMinutes);
 
         try
@@ -181,15 +181,15 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
                 Verb = HttpVerb.GET,
                 Expires = dateTimeProvider.ToDateTime(utcNow)
             };
-            
+
             string? preSignedUrl = await amazonS3.GetPreSignedURLAsync(request);
-            
+
             if (string.IsNullOrEmpty(preSignedUrl))
             {
                 logger.LogError("Failed to generate download URL for fileKey {FileKey}", fileKey);
                 return Result.Failure<string>(StorageErrors.DownloadFailed);
             }
-            
+
             return Result.Success(preSignedUrl);
         }
         catch (AmazonS3Exception s3Exception)
@@ -201,6 +201,69 @@ internal sealed class StorageServices(IAmazonS3 amazonS3, IOptions<S3Settings> o
         {
             logger.LogError(exception, "Unexpected error generating download URL for fileKey {FileKey}", fileKey);
             return Result.Failure<string>(StorageErrors.UnexpectedError);
+        }
+    }
+
+    public async Task<Result<Dictionary<string, string>>> GetDownloadUrlsAsync(IEnumerable<string> fileKeys, CancellationToken cancellationToken)
+    {
+        List<string> keyList = fileKeys.ToList();
+
+        if (keyList.Count == 0)
+        {
+            return Result.Success(new Dictionary<string, string>());
+        }
+
+        DateTimeOffset utcNow = dateTimeProvider.UtcNow.AddMinutes(ExpiresInMinutes);
+
+        try
+        {
+            // Throttle concurrent S3 API calls to avoid rate limiting
+            SemaphoreSlim throttle = new(maxCount: 10, initialCount: 10);
+
+            List<Task<KeyValuePair<string, string>>> tasks = keyList
+                .Select(async fileKey =>
+                {
+                    await throttle.WaitAsync(cancellationToken);
+                    try
+                    {
+                        string formatedKey = $"{UserFiles}/{fileKey}";
+
+                        GetPreSignedUrlRequest request = new()
+                        {
+                            BucketName = options.Value.BucketName,
+                            Key = formatedKey,
+                            Verb = HttpVerb.GET,
+                            Expires = dateTimeProvider.ToDateTime(utcNow)
+                        };
+
+                        string? url = await amazonS3.GetPreSignedURLAsync(request);
+
+                        return new KeyValuePair<string, string>(fileKey, url ?? string.Empty);
+                    }
+                    finally
+                    {
+                        throttle.Release();
+                    }
+                })
+                .ToList();
+
+            KeyValuePair<string, string>[] results = await Task.WhenAll(tasks);
+
+            Dictionary<string, string> urlMap = results
+                .Where(kvp => !string.IsNullOrEmpty(kvp.Value))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            return Result.Success(urlMap);
+        }
+        catch (AmazonS3Exception s3Exception)
+        {
+            logger.LogError(s3Exception, "S3 error generating batch download URLs");
+            return Result.Failure<Dictionary<string, string>>(StorageErrors.DownloadFailed);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected error generating batch download URLs");
+            return Result.Failure<Dictionary<string, string>>(StorageErrors.UnexpectedError);
         }
     }
 
